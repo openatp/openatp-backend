@@ -5,6 +5,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	id("org.jetbrains.kotlin.jvm") version "1.5.20"
 	id("org.jetbrains.kotlin.plugin.spring") version "1.5.20"
+	id("org.jetbrains.kotlin.plugin.jpa") version "1.5.20"
 }
 
 group = "com.github.xiaosongfu"
@@ -14,6 +15,7 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 repositories {
 	// mavenCentral()
 	maven(url = "https://maven.aliyun.com/repository/central")
+	maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -26,6 +28,14 @@ dependencies {
 	implementation("com.jayway.jsonpath:json-path:2.4.0")
 
 	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
+//	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	runtimeOnly("mysql:mysql-connector-java")
+
+	implementation("io.springfox:springfox-boot-starter:3.0.0")
+
+	implementation("com.github.xiaosongfu:jakarta-common:0.1.0")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
