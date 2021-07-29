@@ -1,22 +1,29 @@
-package com.github.xiaosongfu.atp.execute.service
+package com.github.xiaosongfu.atp.service.testcase.boom
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.xiaosongfu.atp.domain.vo.execute.BoomVO
+import com.github.xiaosongfu.atp.domain.vo.boom.BoomVO
 import com.github.xiaosongfu.atp.entity.project.ProjectRequest
 import com.github.xiaosongfu.atp.entity.testcase.TestCase
+import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteDetail
 import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteHistory
-import com.github.xiaosongfu.atp.execute.box.HttpBox
-import com.github.xiaosongfu.atp.execute.box.HttpRequest
-import com.github.xiaosongfu.atp.service.testcase.execute.TestCaseExecuteService
+import com.github.xiaosongfu.atp.service.testcase.TestCaseExecuteService
+import com.github.xiaosongfu.atp.service.testcase.boom.box.HttpBox
+import com.github.xiaosongfu.atp.service.testcase.boom.box.HttpRequest
+import com.github.xiaosongfu.atp.service.testcase.execute.TestCaseDataService
 import com.github.xiaosongfu.jakarta.exception.service.ServiceException
 import com.jayway.jsonpath.JsonPath
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
-class Boom {
+class BoomService {
+    @Autowired
+    private lateinit var testCaseDataService: TestCaseDataService
+
     @Autowired
     private lateinit var testCaseExecuteService: TestCaseExecuteService
 
@@ -29,15 +36,15 @@ class Boom {
     private val log = LoggerFactory.getLogger(javaClass)
 
     fun boom(projectId: Long, projectServerId: Long, testCaseId: Long) {
-        // 执行 ID
-        val executeId = System.currentTimeMillis().toString()
+        // 执行会话 ID
+        val executeSessionId = System.currentTimeMillis().toString()
 
-        log.debug("$executeId :: 开始执行：Project: $projectId | Server: $projectServerId | TestCase: $testCaseId")
+        log.debug("$executeSessionId :: 开始执行：Project: $projectId | Server: $projectServerId | TestCase: $testCaseId")
 
         // 获取测试案例数据
         val boom: BoomVO
         try {
-            boom = testCaseExecuteService.readTestCaseFullData(projectId, projectServerId, testCaseId)
+            boom = testCaseDataService.readTestCaseFullData(projectId, projectServerId, testCaseId)
                 ?: throw ServiceException(msg = "获取测试案例数据失败")
         } catch (e: ServiceException) {
             log.error("执行失败！[${e.msg}]")
@@ -47,12 +54,12 @@ class Boom {
             return
         }
 
-        log.debug("$executeId :: case name(${boom.name}) | case type(${boom.type})")
+        log.debug("$executeSessionId :: case name(${boom.name}) | case type(${boom.type})")
 
-        val testCaseExecuteHistories: List<TestCaseExecuteHistory>? = when (boom.type) {
+        val testCaseExecuteHistories: List<TestCaseExecuteDetail>? = when (boom.type) {
             TestCase.TEST_CASE_TYPE_BENCHMARK -> {
                 if (boom.benchmark != null) {
-                    executeBenchmark(executeId, testCaseId, boom.benchmark!!)
+                    executeBenchmark(executeSessionId, boom.benchmark!!)
                 } else {
                     log.error("测试案例类型为[${boom.type}],但 benchmark 数据为空")
                     null
@@ -60,7 +67,7 @@ class Boom {
             }
             TestCase.TEST_CASE_TYPE_REPLAY -> {
                 if (boom.replay != null) {
-                    executeReplay(executeId, testCaseId, boom.replay!!)
+                    executeReplay(executeSessionId, boom.replay!!)
                 } else {
                     log.error("测试案例类型为[${boom.type}],但 replay 数据为空")
                     null
@@ -68,7 +75,7 @@ class Boom {
             }
             TestCase.TEST_CASE_TYPE_PIPELINE -> {
                 if (boom.pipeline != null) {
-                    executePipeline(executeId, testCaseId, boom.pipeline!!)
+                    executePipeline(executeSessionId, boom.pipeline!!)
                 } else {
                     log.error("测试案例类型为[${boom.type}],但 pipeline 数据为空")
                     null
@@ -81,30 +88,39 @@ class Boom {
         }
 
         // 保存执行结果到数据
+        testCaseExecuteService.insertHistory(
+            TestCaseExecuteHistory(
+                id = executeSessionId,
+                testCaseId = testCaseId,
+                executeDatetime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            )
+        )
         testCaseExecuteHistories?.let {
-            testCaseExecuteService.saveTestCaseExecuteHistory(it)
+            testCaseExecuteService.insertDetails(it)
         }
     }
 
     private fun executeBenchmark(
-        executeId: String,
-        testCaseId: Long,
+        executeSessionId: String,
         benchmark: BoomVO.Benchmark
-    ): List<TestCaseExecuteHistory> {
+    ): List<TestCaseExecuteDetail> {
         TODO()
     }
 
     private fun executeReplay(
-        executeId: String,
-        testCaseId: Long,
+        executeSessionId: String,
         replay: BoomVO.Replay
-    ): List<TestCaseExecuteHistory> {
+    ): List<TestCaseExecuteDetail> {
         // 遍历并执行每个请求
         return replay.requests.map { bundle ->
             // STEP 1: 准备并发起 HTTP 请求
             val testCaseRequestParams = bundle.request.param?.split("##") ?: emptyList() // 切割请求参数
-            log.debug("$executeId :: 请求参数 $testCaseRequestParams")
-            replacePositionAndEnvParams(replay.fetchApi, testCaseRequestParams, BoomStore.readEnvs(executeId)) // 替换占位变量
+            log.debug("$executeSessionId :: 请求参数 $testCaseRequestParams")
+            replacePositionAndEnvParams(
+                replay.fetchApi,
+                testCaseRequestParams,
+                BoomStore.readEnvs(executeSessionId)
+            ) // 替换占位变量
             val httpRequest = HttpRequest(
                 url = replay.fetchApi.url,
                 method = replay.fetchApi.method,
@@ -116,8 +132,8 @@ class Boom {
                     objectMapper.readValue(it, object : TypeReference<HashMap<String, Any>>() {})
                 }
             )
-            val httpResponse = httpBox.doHttp(executeId, httpRequest)
-            log.debug("$executeId :: HTTP 响应码 ${httpResponse.responseCode}")
+            val httpResponse = httpBox.doHttp(executeSessionId, httpRequest)
+            log.debug("$executeSessionId :: HTTP 响应码 ${httpResponse.responseCode}")
             // 请求成功
             if (httpResponse.responseCode == 200) {
                 // STEP 2:
@@ -125,7 +141,7 @@ class Boom {
                 val ctx = JsonPath.parse(httpResponse.responseBody)
                 val execCheckInfo = bundle.execCheck?.mapNotNull { check ->
                     val fieldValue = ctx.read<Any>(check.fieldPath)
-                    log.debug("$executeId :: 执行响应验证 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
+                    log.debug("$executeSessionId :: 执行响应验证 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
 
                     // 判断验证是否成功
                     if (fieldValue != null) {
@@ -142,11 +158,11 @@ class Boom {
                 }
                 val saveEnvVariableInfo = bundle.saveEnvVariable?.mapNotNull { saveEnvVariable ->
                     val variableValue = ctx.read<Any>(saveEnvVariable.projectEnvVariableValuePath)
-                    log.debug("$executeId :: 执行保存环境遍历 变量名称[${saveEnvVariable.variableName}] 默认值[${saveEnvVariable.defaultValue}] 实际值[$variableValue]")
+                    log.debug("$executeSessionId :: 执行保存环境遍历 变量名称[${saveEnvVariable.variableName}] 默认值[${saveEnvVariable.defaultValue}] 实际值[$variableValue]")
 
                     // 保存环境遍历
                     if (variableValue != null) {
-                        BoomStore.saveEnv(executeId, saveEnvVariable.variableName, variableValue.toString())
+                        BoomStore.saveEnv(executeSessionId, saveEnvVariable.variableName, variableValue.toString())
                         // xx
                         SaveEnvVariableInfo(
                             variableName = saveEnvVariable.variableName,
@@ -158,30 +174,28 @@ class Boom {
                 }
 
                 // 转换
-                TestCaseExecuteHistory(
-                    testCaseId = testCaseId,
-                    executeId = executeId,
+                TestCaseExecuteDetail(
+                    executeHistoryId = executeSessionId,
                     testCaseRequestName = bundle.request.name,
                     httpRequest = objectMapper.writeValueAsString(httpRequest),
                     httpResponse = objectMapper.writeValueAsString(httpResponse),
                     execCheckInfo = objectMapper.writeValueAsString(execCheckInfo),
                     execCheckResult = if (execCheckInfo?.all { it.checkResult } == true) {
-                        TestCaseExecuteHistory.EXEC_CHECK_RESULT_CORRECT
+                        TestCaseExecuteDetail.EXEC_CHECK_RESULT_CORRECT
                     } else {
-                        TestCaseExecuteHistory.EXEC_CHECK_RESULT_WRONG
+                        TestCaseExecuteDetail.EXEC_CHECK_RESULT_WRONG
                     },
                     saveEnvVariableInfo = objectMapper.writeValueAsString(saveEnvVariableInfo)
                 )
             } else {
                 // 转换
-                TestCaseExecuteHistory(
-                    testCaseId = testCaseId,
-                    executeId = executeId,
+                TestCaseExecuteDetail(
+                    executeHistoryId = executeSessionId,
                     testCaseRequestName = bundle.request.name,
                     httpRequest = objectMapper.writeValueAsString(httpRequest),
                     httpResponse = objectMapper.writeValueAsString(httpResponse),
                     execCheckInfo = null,
-                    execCheckResult = TestCaseExecuteHistory.EXEC_CHECK_RESULT_WRONG,
+                    execCheckResult = TestCaseExecuteDetail.EXEC_CHECK_RESULT_WRONG,
                     saveEnvVariableInfo = null
                 )
             }
@@ -189,12 +203,21 @@ class Boom {
     }
 
     private fun executePipeline(
-        executeId: String,
-        testCaseId: Long,
+        executeSessionId: String,
         pipeline: BoomVO.Pipeline
-    ): List<TestCaseExecuteHistory> {
+    ): List<TestCaseExecuteDetail> {
         TODO()
     }
+
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+    fun xx(): Double {
+        TODO()
+    }
+
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
     // http.url http.header http.param
     //

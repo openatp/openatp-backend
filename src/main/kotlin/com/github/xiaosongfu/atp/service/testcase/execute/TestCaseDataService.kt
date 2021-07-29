@@ -1,13 +1,11 @@
 package com.github.xiaosongfu.atp.service.testcase.execute
 
-import com.github.xiaosongfu.atp.domain.vo.execute.BoomVO
+import com.github.xiaosongfu.atp.domain.vo.boom.BoomVO
 import com.github.xiaosongfu.atp.entity.testcase.TestCase
-import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteHistory
 import com.github.xiaosongfu.atp.repository.project.ProjectEnvVariableRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestResponseRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectServerRepository
-import com.github.xiaosongfu.atp.repository.testcase.TestCaseExecuteHistoryRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRequestExecCheckRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRequestRepository
@@ -18,7 +16,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class TestCaseExecuteService {
+class TestCaseDataService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     // --- --- Project Detail
@@ -52,12 +50,6 @@ class TestCaseExecuteService {
 
     @Autowired
     private lateinit var testCaseRequestSaveEnvVariableRepository: TestCaseRequestSaveEnvVariableRepository
-
-    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-    // --- --- Test Case
-
-    @Autowired
-    private lateinit var testCaseExecuteHistoryRepository: TestCaseExecuteHistoryRepository
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
@@ -281,11 +273,5 @@ class TestCaseExecuteService {
                 }
             }
         }
-    }
-
-    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-
-    fun saveTestCaseExecuteHistory(histories: List<TestCaseExecuteHistory>) {
-        testCaseExecuteHistoryRepository.saveAll(histories)
     }
 }

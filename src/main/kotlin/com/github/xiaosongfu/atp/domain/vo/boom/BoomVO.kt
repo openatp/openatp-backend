@@ -1,4 +1,4 @@
-package com.github.xiaosongfu.atp.domain.vo.execute
+package com.github.xiaosongfu.atp.domain.vo.boom
 
 import io.swagger.v3.oas.annotations.media.Schema
 import javax.persistence.Column

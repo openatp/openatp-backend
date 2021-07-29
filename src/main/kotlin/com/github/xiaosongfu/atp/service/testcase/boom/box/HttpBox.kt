@@ -1,4 +1,4 @@
-package com.github.xiaosongfu.atp.execute.box
+package com.github.xiaosongfu.atp.service.testcase.boom.box
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.xiaosongfu.atp.entity.project.ProjectRequest

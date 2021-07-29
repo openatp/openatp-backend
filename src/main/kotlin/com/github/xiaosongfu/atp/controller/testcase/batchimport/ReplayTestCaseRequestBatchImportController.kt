@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/testcase/replay/request/batch_import/v1", produces = ["application/json;charset=utf-8"])
-@Tag(name = "2.3 Replay类型测试案例请求批量导入")
+@Tag(name = "2.10 Replay类型测试案例请求批量导入")
 class ReplayTestCaseRequestBatchImportController {
     @Autowired
     private lateinit var batchImportService: ReplayTestCaseRequestBatchImportService
