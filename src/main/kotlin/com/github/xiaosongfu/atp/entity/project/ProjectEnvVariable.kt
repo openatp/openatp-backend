@@ -8,6 +8,9 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
 
+/**
+ * 项目环境遍历配置
+ */
 @Entity
 @Table(name = "project_env_variable")
 data class ProjectEnvVariable(

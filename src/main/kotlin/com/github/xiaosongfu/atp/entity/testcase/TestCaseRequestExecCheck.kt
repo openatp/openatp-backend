@@ -8,6 +8,9 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
 
+/**
+ * 测试案例请求验证配置
+ */
 @Entity
 @Table(name = "test_case_request_exec_check")
 data class TestCaseRequestExecCheck(

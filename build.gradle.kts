@@ -26,6 +26,7 @@ dependencies {
 
 	implementation("com.squareup.okhttp3:okhttp:4.7.2")
 	implementation("com.jayway.jsonpath:json-path:2.4.0")
+	implementation("com.alibaba:easyexcel:2.2.8")
 
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-websocket")

@@ -28,7 +28,7 @@ class TestCaseRequestController {
     @Operation(summary = "新建测试案例请求")
     @PostMapping("/{testCaseId}")
     fun insert(
-        @Parameter(description = "项目 ID") @PathVariable testCaseId: Long,
+        @Parameter(description = "测试案例 ID") @PathVariable testCaseId: Long,
         @RequestBody req: TestCaseRequestInsertRequest // TODO @Valid 验证
     ): R<Unit> {
         testCaseRequestService.insert(testCaseId, req)

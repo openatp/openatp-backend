@@ -8,6 +8,9 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
 
+/**
+ * 项目请求配置
+ */
 @Entity
 @Table(name = "project_request")
 data class ProjectRequest(

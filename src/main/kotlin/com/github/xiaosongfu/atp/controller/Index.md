@@ -6,3 +6,5 @@
 
 2.1 测试案例管理 /testcase/v1
 2.2 测试案例请求管理 /testcase/request/v1
+
+2.3 Replay类型测试案例请求批量导入 /testcase/replay/request/batch_import/v1

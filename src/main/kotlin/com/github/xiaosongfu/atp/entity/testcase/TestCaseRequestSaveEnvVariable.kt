@@ -8,6 +8,9 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
 
+/**
+ * 测试案例请求保存环境遍历配置
+ */
 @Entity
 @Table(name = "test_case_request_save_env_variable")
 data class TestCaseRequestSaveEnvVariable(

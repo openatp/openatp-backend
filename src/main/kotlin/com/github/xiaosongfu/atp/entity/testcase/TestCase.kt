@@ -8,6 +8,9 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
 
+/**
+ * 测试案例配置
+ */
 @Entity
 @Table(name = "test_case")
 data class TestCase(
@@ -29,8 +32,8 @@ data class TestCase(
     var type: String
 ) {
     companion object {
-        const val TEST_CASE_TYPE_BENCHMARK = "benchmark" // 性能：使用相同的请求参数和相同的响应验证调用一个接口
-        const val TEST_CASE_TYPE_REPLAY = "replay"       // 叠放：使用不同的请求参数和不同的响应验证调用一个接口
-        const val TEST_CASE_TYPE_PIPELINE = "pipeline"   // 顺序：使用不同的请求参数和不同的响应验证调用多个接口
+        const val TEST_CASE_TYPE_BENCHMARK = "benchmark" // 性能：使用相同请求参数和相同响应验证的 一个请求 调用一个接口
+        const val TEST_CASE_TYPE_REPLAY = "replay"       // 叠放：使用不同请求参数和不同响应验证的 一个请求 调用一个接口
+        const val TEST_CASE_TYPE_PIPELINE = "pipeline"   // 顺序：使用不同请求参数和不同响应验证的 多个请求 调用多个接口
     }
 }
