@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: openatp
+  profiles:
+    active: dev
+
+server:
+  port: 21091

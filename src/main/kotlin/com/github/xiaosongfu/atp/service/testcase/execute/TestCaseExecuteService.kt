@@ -2,10 +2,12 @@ package com.github.xiaosongfu.atp.service.testcase.execute
 
 import com.github.xiaosongfu.atp.domain.vo.execute.BoomVO
 import com.github.xiaosongfu.atp.entity.testcase.TestCase
+import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteHistory
 import com.github.xiaosongfu.atp.repository.project.ProjectEnvVariableRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestResponseRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectServerRepository
+import com.github.xiaosongfu.atp.repository.testcase.TestCaseExecuteHistoryRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRequestExecCheckRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRequestRepository
@@ -52,8 +54,14 @@ class TestCaseExecuteService {
     private lateinit var testCaseRequestSaveEnvVariableRepository: TestCaseRequestSaveEnvVariableRepository
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    // --- --- Test Case
 
-    fun testCaseFullData(projectId: Long, projectServerId: Long, testCaseId: Long): BoomVO? {
+    @Autowired
+    private lateinit var testCaseExecuteHistoryRepository: TestCaseExecuteHistoryRepository
+
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+    fun readTestCaseFullData(projectId: Long, projectServerId: Long, testCaseId: Long): BoomVO? {
         return testCaseRepository.findByIdOrNull(testCaseId)?.let { testCase ->
             // p1 读取 project-server project-env-variable 的数据
             val projectServer = projectServerRepository.findByProjectIdAndId(projectId, projectServerId)
@@ -273,5 +281,11 @@ class TestCaseExecuteService {
                 }
             }
         }
+    }
+
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+    fun saveTestCaseExecuteHistory(histories: List<TestCaseExecuteHistory>) {
+        testCaseExecuteHistoryRepository.saveAll(histories)
     }
 }

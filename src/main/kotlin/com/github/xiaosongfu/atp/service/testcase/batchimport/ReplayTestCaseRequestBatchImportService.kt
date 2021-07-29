@@ -37,18 +37,22 @@ class ReplayTestCaseRequestBatchImportService {
             excelData.forEach { row ->
                 row.forEach { (index, value) ->
                     if (index == 0) {
-                        val newTestCaseRequest = testCaseRequest.copy(param = value)
-                        testCaseRequestRepository.save(newTestCaseRequest)
+                        if (value.isNotEmpty()) { // 要不为空才保存
+                            val newTestCaseRequest = testCaseRequest.copy(param = value)
+                            testCaseRequestRepository.save(newTestCaseRequest)
+                        }
                     } else {
                         if (index <= (projectRequestResponseList?.size ?: 0)) {
                             projectRequestResponseList?.get(index - 1)?.let { projectRequestResponse ->
-                                testCaseRequestExecCheckRepository.save(
-                                    TestCaseRequestExecCheck(
-                                        testCaseRequestId = testCaseRequest.id,
-                                        projectRequestResponseId = projectRequestResponse.id,
-                                        wantResponseFieldValue = value
+                                if (value.isNotEmpty()) { // 要不为空才保存
+                                    testCaseRequestExecCheckRepository.save(
+                                        TestCaseRequestExecCheck(
+                                            testCaseRequestId = testCaseRequest.id,
+                                            projectRequestResponseId = projectRequestResponse.id,
+                                            wantResponseFieldValue = value
+                                        )
                                     )
-                                )
+                                }
                             }
                         }
                     }

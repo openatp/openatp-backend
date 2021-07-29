@@ -35,7 +35,7 @@ data class ProjectRequest(
     @Column(name = "content_type")
     var contentType: String? = null,
 
-    @Schema(description = "请求参数")
+    @Schema(description = "请求参数 可以使用 HashMap<String, Any> 解析")
     @Column(name = "param")
     var param: String? = null,
 
@@ -46,4 +46,22 @@ data class ProjectRequest(
     @Schema(description = "请求超时")
     @Column(name = "timeout")
     var timeout: Long
-)
+) {
+    // http 请求的 Method
+    class Method {
+        companion object {
+            const val GET = "GET"
+            const val POST = "POST"
+            const val DELETE = "DELETE"
+            const val PUT = "PUT"
+        }
+    }
+
+    // http 请求的 Content-Type
+    class ContentType {
+        companion object {
+            const val JSON = "JSON" // Content-Type:application/json
+            const val FORM = "FORM" // Content-Type:application/x-www-form-urlencoded
+        }
+    }
+}
