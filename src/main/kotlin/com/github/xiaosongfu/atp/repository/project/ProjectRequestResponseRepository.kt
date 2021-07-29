@@ -6,4 +6,6 @@ import org.springframework.data.repository.PagingAndSortingRepository
 interface ProjectRequestResponseRepository : PagingAndSortingRepository<ProjectRequestResponse, Long> {
     fun findAllByRequestId(requestId: Long): List<ProjectRequestResponse>?
     fun deleteAllByRequestId(requestId: Long)
+
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 }
