@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/project/env_variable/v1", produces = ["application/json;charset=utf-8"])
@@ -28,7 +29,7 @@ class ProjectEnvVariableController {
     @PostMapping("/{projectId}")
     fun insert(
         @Parameter(description = "项目 ID") @PathVariable projectId: Long,
-        @RequestBody req: ProjectEnvVariableInsertRequest // TODO @Valid 验证
+        @RequestBody @Valid req: ProjectEnvVariableInsertRequest
     ): R<Unit> {
         projectEnvVariableService.insert(projectId, req)
         return R.success()
@@ -47,7 +48,7 @@ class ProjectEnvVariableController {
     @Operation(summary = "更新环境变量")
     fun update(
         @Parameter(description = "环境变量 ID") @PathVariable projectEnvVariableId: Long,
-        @RequestBody req: ProjectEnvVariableInsertRequest
+        @RequestBody @Valid req: ProjectEnvVariableInsertRequest
     ): R<Unit> {
         projectEnvVariableService.update(projectEnvVariableId, req)
         return R.success()

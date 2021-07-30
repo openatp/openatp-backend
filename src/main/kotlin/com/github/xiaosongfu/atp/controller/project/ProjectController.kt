@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/project/v1", produces = ["application/json;charset=utf-8"])
@@ -27,7 +28,7 @@ class ProjectController {
     @Operation(summary = "新建项目")
     @PostMapping
     fun insert(
-        @RequestBody req: ProjectInsertRequest // TODO @Valid 验证
+        @RequestBody @Valid req: ProjectInsertRequest
     ): R<Unit> {
         projectService.insert(req)
         return R.success()
@@ -46,7 +47,7 @@ class ProjectController {
     @Operation(summary = "更新项目")
     fun update(
         @Parameter(description = "项目 ID") @PathVariable projectId: Long,
-        @RequestBody req: ProjectInsertRequest
+        @RequestBody @Valid req: ProjectInsertRequest
     ): R<Unit> {
         projectService.update(projectId, req)
         return R.success()

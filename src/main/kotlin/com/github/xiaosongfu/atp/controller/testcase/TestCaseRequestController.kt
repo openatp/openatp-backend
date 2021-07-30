@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/testcase/request/v1", produces = ["application/json;charset=utf-8"])
@@ -29,7 +30,7 @@ class TestCaseRequestController {
     @PostMapping("/{testCaseId}")
     fun insert(
         @Parameter(description = "测试案例 ID") @PathVariable testCaseId: Long,
-        @RequestBody req: TestCaseRequestInsertRequest // TODO @Valid 验证
+        @RequestBody @Valid req: TestCaseRequestInsertRequest
     ): R<Unit> {
         testCaseRequestService.insert(testCaseId, req)
         return R.success()
@@ -48,7 +49,7 @@ class TestCaseRequestController {
     @Operation(summary = "更新测试案例请求")
     fun update(
         @Parameter(description = "测试案例请求 ID") @PathVariable testCaseRequestId: Long,
-        @RequestBody req: TestCaseRequestInsertRequest
+        @RequestBody @Valid req: TestCaseRequestInsertRequest
     ): R<Unit> {
         testCaseRequestService.update(testCaseRequestId, req)
         return R.success()
