@@ -150,12 +150,12 @@ class BoomService {
                 }
             )
             val httpResponse = httpBox.doHttp(executeSessionId, httpRequest)
-            log.debug("$executeSessionId :: HTTP 响应码 ${httpResponse.responseCode}")
+            log.debug("$executeSessionId :: HTTP 响应结果 $httpResponse")
             // 请求成功
-            if (httpResponse.responseCode == 200) {
+            if (httpResponse.code == 200) {
                 // STEP 2:
                 // STEP 3:
-                val ctx = JsonPath.parse(httpResponse.responseBody)
+                val ctx = JsonPath.parse(httpResponse.body)
                 val execCheckInfo = bundle.execCheck?.mapNotNull { check ->
                     val fieldValue = ctx.read<Any>(check.fieldPath)
                     log.debug("$executeSessionId :: 执行响应验证 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")

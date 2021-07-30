@@ -61,7 +61,11 @@ class HttpBox {
 
         // 2 执行请求
         okHttpClient.newCall(request).execute().use { response ->
-            return HttpResponse(responseCode = response.code, responseBody = response.body?.string() ?: "")
+            return HttpResponse(
+                code = response.code,
+                body = response.body?.string() ?: "",
+                duration = response.receivedResponseAtMillis - response.sentRequestAtMillis
+            )
         }
     }
 
@@ -286,6 +290,7 @@ data class HttpRequest(
 )
 
 data class HttpResponse(
-    val responseCode: Int,
-    val responseBody: String
+    val code: Int,
+    val body: String,
+    val duration: Long // 单位：ms
 )
