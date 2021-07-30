@@ -6,7 +6,6 @@ import com.github.xiaosongfu.atp.domain.vo.boom.BoomVO
 import com.github.xiaosongfu.atp.entity.project.ProjectRequest
 import com.github.xiaosongfu.atp.entity.testcase.TestCase
 import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteDetail
-import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteHistory
 import com.github.xiaosongfu.atp.service.testcase.TestCaseExecuteService
 import com.github.xiaosongfu.atp.service.testcase.boom.box.HttpBox
 import com.github.xiaosongfu.atp.service.testcase.boom.box.HttpRequest
@@ -16,8 +15,6 @@ import com.jayway.jsonpath.JsonPath
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Service
 class BoomService {
@@ -39,7 +36,10 @@ class BoomService {
         // 执行会话 ID
         val executeSessionId = System.currentTimeMillis().toString()
 
+        // 开始执行
+        // TAG :: 保存 测试案例执行记录 -- 开始执行
         log.debug("$executeSessionId :: 开始执行：Project: $projectId | Server: $projectServerId | TestCase: $testCaseId")
+        testCaseExecuteService.insertHistoryForStartRunning(executeSessionId, testCaseId)
 
         // 获取测试案例数据
         val boom: BoomVO
@@ -49,6 +49,9 @@ class BoomService {
         } catch (e: ServiceException) {
             log.error("执行失败！[${e.msg}]")
             e.printStackTrace()
+
+            // TAG :: 更新 测试案例执行记录 -- 失败
+            testCaseExecuteService.updateHistoryForExecuteFailed(executeSessionId, e.msg)
 
             // 一定要 return 以结束代码执行
             return
@@ -88,15 +91,26 @@ class BoomService {
         }
 
         // 保存执行结果到数据
-        testCaseExecuteService.insertHistory(
-            TestCaseExecuteHistory(
-                id = executeSessionId,
-                testCaseId = testCaseId,
-                executeDatetime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        if (testCaseExecuteHistories != null) {
+            // 计算总的请求数和验证成功的请求数
+            val requestTotalCount = testCaseExecuteHistories.size
+            val requestCheckCorrectCount = testCaseExecuteHistories.count {
+                it.execCheckResult == TestCaseExecuteDetail.EXEC_CHECK_RESULT_CORRECT
+            }
+            // TAG :: 更新 测试案例执行记录 -- 成功
+            testCaseExecuteService.updateHistoryForExecuteSuccess(
+                executeSessionId,
+                requestTotalCount,
+                requestCheckCorrectCount
             )
-        )
-        testCaseExecuteHistories?.let {
-            testCaseExecuteService.insertDetails(it)
+            testCaseExecuteService.insertDetails(testCaseExecuteHistories)
+
+            log.debug("${boom.name} 执行成功!")
+        } else {
+            // TAG :: 更新 测试案例执行记录 -- 失败
+            testCaseExecuteService.updateHistoryForExecuteFailed(executeSessionId, "可能没有 TestCaseRequest")
+
+            log.debug("${boom.name} 执行失败!")
         }
     }
 
