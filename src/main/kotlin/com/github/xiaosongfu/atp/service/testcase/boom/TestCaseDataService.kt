@@ -1,4 +1,4 @@
-package com.github.xiaosongfu.atp.service.testcase.execute
+package com.github.xiaosongfu.atp.service.testcase.boom
 
 import com.github.xiaosongfu.atp.domain.vo.boom.BoomVO
 import com.github.xiaosongfu.atp.entity.testcase.TestCase
@@ -53,6 +53,7 @@ class TestCaseDataService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
+    // 封装数据给 BoomService 执行用
     fun readTestCaseFullData(projectId: Long, projectServerId: Long, testCaseId: Long): BoomVO? {
         return testCaseRepository.findByIdOrNull(testCaseId)?.let { testCase ->
             // p1 读取 project-server project-env-variable 的数据

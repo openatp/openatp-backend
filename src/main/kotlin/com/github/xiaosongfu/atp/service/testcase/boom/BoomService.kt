@@ -9,7 +9,7 @@ import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteDetail
 import com.github.xiaosongfu.atp.service.testcase.TestCaseExecuteService
 import com.github.xiaosongfu.atp.service.testcase.boom.box.HttpBox
 import com.github.xiaosongfu.atp.service.testcase.boom.box.HttpRequest
-import com.github.xiaosongfu.atp.service.testcase.execute.TestCaseDataService
+import com.github.xiaosongfu.atp.service.testcase.boom.box.ReplaceParamBox
 import com.github.xiaosongfu.jakarta.exception.service.ServiceException
 import com.jayway.jsonpath.JsonPath
 import org.slf4j.LoggerFactory
@@ -29,6 +29,9 @@ class BoomService {
 
     @Autowired
     private lateinit var httpBox: HttpBox
+
+    @Autowired
+    private lateinit var replaceParamBox: ReplaceParamBox
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -130,7 +133,7 @@ class BoomService {
             // STEP 1: 准备并发起 HTTP 请求
             val testCaseRequestParams = bundle.request.param?.split("##") ?: emptyList() // 切割请求参数
             log.debug("$executeSessionId :: 请求参数 $testCaseRequestParams")
-            replacePositionAndEnvParams(
+            replaceParamBox.replacePositionAndEnvParams(
                 replay.fetchApi,
                 testCaseRequestParams,
                 BoomStore.readEnvs(executeSessionId)
@@ -221,65 +224,6 @@ class BoomService {
         pipeline: BoomVO.Pipeline
     ): List<TestCaseExecuteDetail> {
         TODO()
-    }
-
-    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-
-    fun xx(): Double {
-        TODO()
-    }
-
-    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-
-    // http.url http.header http.param
-    //
-    // PositionParam : $[0]
-    // EnvParam : ${姓名}
-    //
-    private fun replacePositionAndEnvParams(
-        fetchApi: BoomVO.FetchApi,
-        testCaseRequestParams: List<String>,
-        envs: HashMap<String, String>
-    ) {
-        // http.url
-        fetchApi.url = replacePositionParams(fetchApi.url, testCaseRequestParams)
-        fetchApi.url = replaceEnvParams(fetchApi.url, envs)
-
-        // http.header
-        fetchApi.header?.let {
-            fetchApi.header = replacePositionParams(it, testCaseRequestParams)
-            fetchApi.header = replaceEnvParams(it, envs)
-        }
-
-        // http.param
-        fetchApi.param?.let {
-            fetchApi.param = replacePositionParams(it, testCaseRequestParams)
-            fetchApi.param = replaceEnvParams(it, envs)
-        }
-    }
-
-    // 替换位置参数
-    private fun replacePositionParams(source: String, testCaseRequestParams: List<String>): String {
-        var result = source
-
-        testCaseRequestParams.forEachIndexed { index, param ->
-            result = result.replace("\$[${index}]", param) // PositionParam : $[0]
-        }
-
-        return result
-    }
-
-    // 替换环境变量参数
-    private fun replaceEnvParams(source: String, envs: HashMap<String, String>): String {
-        var result = source
-
-        envs.forEach { env ->
-            result = result.replace("\${${env.key}}", env.value) // EnvParam : ${姓名}
-        }
-
-        return result
     }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
