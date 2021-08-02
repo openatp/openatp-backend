@@ -64,9 +64,11 @@ class ProjectRequestController {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    @GetMapping("/list")
+    @GetMapping("/list/{projectId}")
     @Operation(summary = "请求列表--分页")
-    fun list(): R<List<ProjectRequest>> {
-        return R.success(data = projectRequestService.list())
+    fun list(
+        @Parameter(description = "项目 ID") @PathVariable projectId: Long
+    ): R<List<ProjectRequest>> {
+        return R.success(data = projectRequestService.list(projectId))
     }
 }

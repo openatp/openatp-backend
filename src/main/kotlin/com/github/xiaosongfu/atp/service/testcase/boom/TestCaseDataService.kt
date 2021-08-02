@@ -105,6 +105,7 @@ class TestCaseDataService {
                         // benchmark 封装
                         val benchmark = BoomVO.Benchmark(
                             fetchApi = BoomVO.FetchApi(
+                                name = projectRequest.name,
                                 url = projectServer.baseUrl + projectRequest.path,
                                 method = projectRequest.method,
                                 contentType = projectRequest.contentType,
@@ -184,6 +185,7 @@ class TestCaseDataService {
                         // replay 封装
                         val replay = BoomVO.Replay(
                             fetchApi = BoomVO.FetchApi(
+                                name = projectRequest.name,
                                 url = projectServer.baseUrl + projectRequest.path,
                                 method = projectRequest.method,
                                 contentType = projectRequest.contentType,
@@ -243,6 +245,7 @@ class TestCaseDataService {
                             // 单个请求封装
                             BoomVO.Pipeline.Bundle(
                                 fetchApi = BoomVO.FetchApi(
+                                    name = projectRequest.name,
                                     url = projectServer.baseUrl + projectRequest.path,
                                     method = projectRequest.method,
                                     contentType = projectRequest.contentType,

@@ -1,7 +1,6 @@
 package com.github.xiaosongfu.atp.domain.vo.boom
 
 import io.swagger.v3.oas.annotations.media.Schema
-import javax.persistence.Column
 
 data class BoomVO(
     @Schema(description = "测试案例名称")
@@ -81,6 +80,9 @@ data class BoomVO(
     // --- --- --- --- --- ---
 
     data class FetchApi(
+        @Schema(description = "请求名称")
+        var name: String,
+
         @Schema(description = "请求完整地址,可直接请求")
         var url: String,
 
@@ -91,7 +93,6 @@ data class BoomVO(
         var contentType: String? = null,
 
         @Schema(description = "请求参数")
-        @Column(name = "param")
         var param: String? = null,
 
         @Schema(description = "请求头")

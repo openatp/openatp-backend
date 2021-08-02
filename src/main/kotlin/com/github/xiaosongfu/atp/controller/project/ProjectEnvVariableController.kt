@@ -56,9 +56,11 @@ class ProjectEnvVariableController {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    @GetMapping("/all")
+    @GetMapping("/all/{projectId}")
     @Operation(summary = "环境变量列表--不分页")
-    fun all(): R<List<ProjectEnvVariable>> {
-        return R.success(data = projectEnvVariableService.all())
+    fun all(
+        @Parameter(description = "项目 ID") @PathVariable projectId: Long
+    ): R<List<ProjectEnvVariable>> {
+        return R.success(data = projectEnvVariableService.all(projectId))
     }
 }

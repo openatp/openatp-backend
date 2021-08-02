@@ -41,7 +41,7 @@ class ProjectServerService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    fun all(): List<ProjectServer>? {
-        return projectServerRepository.findAll().toList()
+    fun all(projectId: Long): List<ProjectServer>? {
+        return projectServerRepository.findAllByProjectId(projectId)
     }
 }

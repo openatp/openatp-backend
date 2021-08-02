@@ -56,9 +56,11 @@ class ProjectServerController {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    @GetMapping("/all")
+    @GetMapping("/all/{projectId}")
     @Operation(summary = "服务器列表--不分页")
-    fun all(): R<List<ProjectServer>> {
-        return R.success(data = projectServerService.all())
+    fun all(
+        @Parameter(description = "项目 ID") @PathVariable projectId: Long
+    ): R<List<ProjectServer>> {
+        return R.success(data = projectServerService.all(projectId))
     }
 }

@@ -150,7 +150,7 @@ class BoomService {
                 }
             )
             val httpResponse = httpBox.doHttp(executeSessionId, httpRequest)
-            log.debug("$executeSessionId :: HTTP 响应结果 $httpResponse")
+            log.debug("$executeSessionId :: HTTP 请求[${bundle.request.name}]的响应结果 $httpResponse")
             // 请求成功
             if (httpResponse.code == 200) {
                 // STEP 2:

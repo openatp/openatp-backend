@@ -3,6 +3,9 @@ package com.github.xiaosongfu.atp.domain.vo.project
 import io.swagger.v3.oas.annotations.media.Schema
 
 data class ProjectRequestVO(
+    @Schema(description = "请求名称")
+    var name: String,
+
     @Schema(description = "请求路径,如 /v1/welcome,必须以/开头")
     var path: String,
 

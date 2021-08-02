@@ -26,6 +26,7 @@ class ProjectRequestService {
         val request = projectRequestRepository.save(
             ProjectRequest(
                 projectId = projectId,
+                name = req.request.name,
                 path = req.request.path,
                 method = req.request.method,
                 contentType = req.request.contentType,
@@ -70,6 +71,7 @@ class ProjectRequestService {
             ProjectRequestFindResponse(
                 id = req.id,
                 request = ProjectRequestVO(
+                    name = req.name,
                     path = req.path,
                     method = req.method,
                     contentType = req.contentType,
@@ -84,7 +86,7 @@ class ProjectRequestService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    fun list(): List<ProjectRequest>? {
-        return projectRequestRepository.findAll().toList()
+    fun list(projectId: Long): List<ProjectRequest>? {
+        return projectRequestRepository.findAllByProjectId(projectId)
     }
 }

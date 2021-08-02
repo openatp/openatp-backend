@@ -41,7 +41,7 @@ class ProjectEnvVariableService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    fun all(): List<ProjectEnvVariable>? {
-        return projectEnvVariableRepository.findAll().toList()
+    fun all(projectId: Long): List<ProjectEnvVariable>? {
+        return projectEnvVariableRepository.findAllByProjectId(projectId)
     }
 }
