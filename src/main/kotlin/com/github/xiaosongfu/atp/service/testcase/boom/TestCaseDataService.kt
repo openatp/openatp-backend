@@ -61,7 +61,10 @@ class TestCaseDataService {
                 ?: throw ServiceException(msg = "要执行的项目服务器不存在")
             val projectEnvVariableList = projectEnvVariableRepository.findAllByProjectId(projectId)
 
-            testCaseRequestRepository.findAllByTestCaseId(testCaseId)?.let { testCaseRequests ->
+            // TODO 没有数据时 findAllByTestCaseId() 居然不返回 null 而是空数组 !!!
+//            testCaseRequestRepository.findAllByTestCaseId(testCaseId)?.let { testCaseRequests ->
+            val testCaseRequests = testCaseRequestRepository.findAllByTestCaseId(testCaseId)
+            if (testCaseRequests != null && testCaseRequests.isNotEmpty()) {
                 when (testCase.type) {
                     // 1
                     TestCase.TEST_CASE_TYPE_BENCHMARK -> {
@@ -125,6 +128,7 @@ class TestCaseDataService {
                         BoomVO(
                             name = testCase.name,
                             type = testCase.type,
+                            projectServerName = projectServer.envName,
                             benchmark = benchmark
                         )
                     }
@@ -200,6 +204,7 @@ class TestCaseDataService {
                         BoomVO(
                             name = testCase.name,
                             type = testCase.type,
+                            projectServerName = projectServer.envName,
                             replay = replay
                         )
                     }
@@ -266,6 +271,7 @@ class TestCaseDataService {
                         BoomVO(
                             name = testCase.name,
                             type = testCase.type,
+                            projectServerName = projectServer.envName,
                             pipeline = BoomVO.Pipeline(
                                 requests = requests
                             )
@@ -275,6 +281,8 @@ class TestCaseDataService {
                         null
                     }
                 }
+            } else {
+                throw ServiceException(msg = "测试案例没有配置请求")
             }
         }
     }

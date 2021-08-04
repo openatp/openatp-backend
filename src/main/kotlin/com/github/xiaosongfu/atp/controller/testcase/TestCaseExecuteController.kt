@@ -72,10 +72,11 @@ class TestCaseExecuteController {
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${executeHistoryId}.xlsx")
 
         // 测试案例执行概览 表头
-        val overviewTitle = listOf("服务器名称", "执行状态", "执行状态详情", "总的请求数量", "请求成功的请求数量", "请求成功率", "请求验证正确的请求数量", "请求验证正确率")
+        val overviewTitle = listOf("执行时间", "服务器名称", "执行状态", "执行状态详情", "总的请求数量", "请求成功的请求数量", "请求成功率", "请求验证正确的请求数量", "请求验证正确率")
         // 测试案例执行概览 表格数据
         val overviewExcelData = testCaseExecuteService.find(executeHistoryId)?.let {
             listOf(
+                it.executeDatetime,
                 it.projectServerName,
                 it.executeStatus,
                 it.executeStatusDetail ?: "",

@@ -23,23 +23,23 @@ data class TestCaseExecuteDetail(
     @Column(name = "execute_id")
     var executeHistoryId: String,
 
-    @Schema(description = "测试案例 ID")
+    @Schema(description = "测试案例请求名称")
     @Column(name = "test_case_request_name")
     var testCaseRequestName: String,
 
-    @Schema(description = "测试案例 ID")
+    @Schema(description = "HTTP 请求")
     @Column(name = "http_request")
     var httpRequest: String,
 
-    @Schema(description = "测试案例 ID")
+    @Schema(description = "HTTP 响应")
     @Column(name = "http_response")
     var httpResponse: String,
 
-    @Schema(description = "测试案例 ID")
+    @Schema(description = "请求验证信息")
     @Column(name = "exec_check_info")
     var execCheckInfo: String?,
 
-    @Schema(description = "测试案例 ID")
+    @Schema(description = "请求验证结果")
     @Column(name = "exec_check_result")
     var execCheckResult: Int,
 

@@ -35,7 +35,7 @@ class ReplayTestCaseRequestBatchImportController {
     ) {
         // 准备 sheet 头
         val excelData = mutableListOf("请求参数")
-        batchImportService.downloadTemplateExcel(testCaseId)?.let { check ->
+        batchImportService.downloadTemplateExcel(testCaseId)?.map { check ->
             excelData.add("响应验证-$check")
         }
 
