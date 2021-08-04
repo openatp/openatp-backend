@@ -41,7 +41,7 @@ class TestCaseService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    fun list(): List<TestCase>? {
-        return testCaseRepository.findAll().toList()
+    fun list(projectId: Long): List<TestCase>? {
+        return testCaseRepository.findAllByProjectId(projectId)
     }
 }

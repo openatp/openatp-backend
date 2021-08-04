@@ -56,9 +56,11 @@ class TestCaseController {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    @GetMapping("/list")
+    @GetMapping("/list/{projectId}")
     @Operation(summary = "测试案例列表--分页")
-    fun list(): R<List<TestCase>> {
-        return R.success(data = testCaseService.list())
+    fun list(
+        @Parameter(description = "项目 ID") @PathVariable projectId: Long
+    ): R<List<TestCase>> {
+        return R.success(data = testCaseService.list(projectId))
     }
 }

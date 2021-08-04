@@ -46,7 +46,8 @@ data class TestCaseExecuteHistory(
 ) {
     companion object {
         const val EXECUTE_STATUS_RUNNING = 0
-        const val EXECUTE_STATUS_FAILED = 1
-        const val EXECUTE_STATUS_SUCCESS = 2
+        const val EXECUTE_STATUS_ERROR = 1
+        const val EXECUTE_STATUS_FAILED = 2
+        const val EXECUTE_STATUS_SUCCESS = 3
     }
 }

@@ -106,7 +106,7 @@ class TestCaseRequestService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    fun list(): List<TestCaseRequest>? {
-        return testCaseRequestRepository.findAll().toList()
+    fun list(testCaseId: Long): List<TestCaseRequest>? {
+        return testCaseRequestRepository.findAllByTestCaseId(testCaseId)
     }
 }
