@@ -69,7 +69,7 @@ class TestCaseRequestController {
     @Operation(summary = "测试案例请求列表--分页")
     fun list(
         @Parameter(description = "测试案例 ID") @PathVariable testCaseId: Long
-    ): R<List<TestCaseRequest>> {
-        return R.success(data = testCaseRequestService.list(testCaseId))
+    ): R<List<TestCaseFindResponse>> {
+        return R.success(data = testCaseRequestService.listWithDetail(testCaseId))
     }
 }

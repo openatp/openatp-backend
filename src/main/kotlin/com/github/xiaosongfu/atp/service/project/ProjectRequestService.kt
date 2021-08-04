@@ -9,6 +9,7 @@ import com.github.xiaosongfu.atp.entity.project.ProjectRequestResponse
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestResponseRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -58,41 +59,43 @@ class ProjectRequestService {
         TODO()
     }
 
-//    fun detail(projectRequestId: Long): ProjectRequestFindResponse? {
-//        return projectRequestRepository.findByIdOrNull(projectRequestId)?.let { req ->
-//            val responseFieldValidate = projectRequestResponseRepository.findAllByRequestId(req.id)?.map { resp ->
-//                ProjectRequestResponseVO(
-//                    fieldName = resp.fieldName,
-//                    fieldPath = resp.fieldPath
-//                )
-//            }
-//
-//            ProjectRequestFindResponse(
-//                id = req.id,
-//                request = ProjectRequestVO(
-//                    name = req.name,
-//                    path = req.path,
-//                    method = req.method,
-//                    contentType = req.contentType,
-//                    param = req.param,
-//                    header = req.header,
-//                    timeout = req.timeout
-//                ),
-//                responseFieldValidate = responseFieldValidate
-//            )
-//        }
-//    }
+    fun detail(projectRequestId: Long): ProjectRequestFindResponse? {
+        return projectRequestRepository.findByIdOrNull(projectRequestId)?.let { req ->
+            val responseFieldValidate = projectRequestResponseRepository.findAllByRequestId(req.id)?.map { resp ->
+                ProjectRequestResponseVO(
+                    id = resp.id,
+                    fieldName = resp.fieldName,
+                    fieldPath = resp.fieldPath
+                )
+            }
+
+            ProjectRequestFindResponse(
+                id = req.id,
+                request = ProjectRequestVO(
+                    name = req.name,
+                    path = req.path,
+                    method = req.method,
+                    contentType = req.contentType,
+                    param = req.param,
+                    header = req.header,
+                    timeout = req.timeout
+                ),
+                responseFieldValidate = responseFieldValidate
+            )
+        }
+    }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    fun list(projectId: Long): List<ProjectRequest>? {
-        return projectRequestRepository.findAllByProjectId(projectId)
-    }
+//    fun list(projectId: Long): List<ProjectRequest>? {
+//        return projectRequestRepository.findAllByProjectId(projectId)
+//    }
 
     fun listWithDetail(projectId: Long): List<ProjectRequestFindResponse>? {
         return projectRequestRepository.findAllByProjectId(projectId)?.map { req ->
             val responseFieldValidate = projectRequestResponseRepository.findAllByRequestId(req.id)?.map { resp ->
                 ProjectRequestResponseVO(
+                    id = resp.id,
                     fieldName = resp.fieldName,
                     fieldPath = resp.fieldPath
                 )

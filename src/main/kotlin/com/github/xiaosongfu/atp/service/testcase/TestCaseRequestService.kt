@@ -106,7 +106,37 @@ class TestCaseRequestService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    fun list(testCaseId: Long): List<TestCaseRequest>? {
-        return testCaseRequestRepository.findAllByTestCaseId(testCaseId)
+//    fun list(testCaseId: Long): List<TestCaseRequest>? {
+//        return testCaseRequestRepository.findAllByTestCaseId(testCaseId)
+//    }
+
+    fun listWithDetail(testCaseId: Long): List<TestCaseFindResponse>? {
+        return testCaseRequestRepository.findAllByTestCaseId(testCaseId)?.map { req ->
+            val requestExecCheck = testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(req.id)?.map { check ->
+                TestCaseRequestExecCheckVO(
+                    projectRequestResponseId = check.projectRequestResponseId,
+                    wantResponseFieldValue = check.wantResponseFieldValue
+                )
+            }
+
+            val requestSaveEnvVariable =
+                testCaseRequestSaveEnvVariableRepository.findAllByTestCaseRequestId(req.id)?.map { env ->
+                    TestCaseRequestSaveEnvVariableVO(
+                        projectEnvVariableId = env.projectEnvVariableId,
+                        projectEnvVariableValuePath = env.projectEnvVariableValuePath
+                    )
+                }
+
+            TestCaseFindResponse(
+                id = req.id,
+                request = TestCaseRequestVO(
+                    name = req.name,
+                    projectRequestId = req.projectRequestId,
+                    param = req.param
+                ),
+                requestExecCheck = requestExecCheck,
+                requestSaveEnvVariable = requestSaveEnvVariable
+            )
+        }
     }
 }

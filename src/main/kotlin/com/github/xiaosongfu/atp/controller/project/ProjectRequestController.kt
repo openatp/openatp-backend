@@ -54,23 +54,15 @@ class ProjectRequestController {
         TODO()
     }
 
-//    @GetMapping("/detail/{projectRequestId}")
-//    @Operation(summary = "请求详情")
-//    fun detail(
-//        @Parameter(description = "请求 ID") @PathVariable projectRequestId: Long,
-//    ): R<ProjectRequestFindResponse> {
-//        return R.success(data = projectRequestService.detail(projectRequestId))
-//    }
+    @GetMapping("/detail/{projectRequestId}")
+    @Operation(summary = "请求详情")
+    fun detail(
+        @Parameter(description = "请求 ID") @PathVariable projectRequestId: Long,
+    ): R<ProjectRequestFindResponse> {
+        return R.success(data = projectRequestService.detail(projectRequestId))
+    }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-
-//    @GetMapping("/list/{projectId}")
-//    @Operation(summary = "请求列表--分页")
-//    fun list(
-//        @Parameter(description = "项目 ID") @PathVariable projectId: Long
-//    ): R<List<ProjectRequest>> {
-//        return R.success(data = projectRequestService.list(projectId))
-//    }
 
     @GetMapping("/list/{projectId}")
     @Operation(summary = "请求列表--分页")
