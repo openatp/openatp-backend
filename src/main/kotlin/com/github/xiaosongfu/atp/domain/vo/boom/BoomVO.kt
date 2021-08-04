@@ -9,6 +9,9 @@ data class BoomVO(
     @Schema(description = "测试案例类型")
     var type: String,
 
+    @Schema(description = "项目服务器名称")
+    var projectServerName: String,
+
     @Schema(description = "benchmark 测试数据")
     var benchmark: Benchmark? = null,
 

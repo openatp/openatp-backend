@@ -48,7 +48,8 @@ data class TestCaseExecuteDetail(
     var saveEnvVariableInfo: String?
 ) {
     companion object {
-        const val EXEC_CHECK_RESULT_WRONG = 0
-        const val EXEC_CHECK_RESULT_CORRECT = 1
+        const val EXEC_CHECK_REQUEST_ERROR = 0
+        const val EXEC_CHECK_RESULT_WRONG = 1
+        const val EXEC_CHECK_RESULT_CORRECT = 2
     }
 }

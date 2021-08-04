@@ -66,11 +66,42 @@ class TestCaseExecuteController {
         @Parameter(description = "测试案例执行记录 ID") @PathVariable executeHistoryId: String,
         response: HttpServletResponse
     ) {
-        // 表头
-        val title = listOf("编号", "请求名称", "HTTP 请求", "HTTP 响应", "保存环境变量", "响应验证信息", "响应验证结果")
+        // 设置响应头
+        response.contentType = "application/vnd.ms-excel"
+        response.characterEncoding = "utf-8"
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${executeHistoryId}.xlsx")
 
-        // 表格数据
-        val excelData = testCaseExecuteService.detail(executeHistoryId)?.map {
+        // 测试案例执行概览 表头
+        val overviewTitle = listOf("服务器名称", "执行状态", "执行状态详情", "总的请求数量", "请求成功的请求数量", "请求成功率", "请求验证正确的请求数量", "请求验证正确率")
+        // 测试案例执行概览 表格数据
+        val overviewExcelData = testCaseExecuteService.find(executeHistoryId)?.let {
+            listOf(
+                it.projectServerName,
+                it.executeStatus,
+                it.executeStatusDetail ?: "",
+                it.requestTotalCount,
+                it.requestSuccessCount,
+                it.requestSuccessRate,
+                it.requestCheckCorrectCount,
+                it.requestCheckCorrectRate
+            )
+        }
+        // |-----------|-------------|------------|-------------|-----------------|-----------|-----------------------|-------------|
+        // |  服务器名称 |   执行状态   | 执行状态详情 | 总的请求数量  | 请求成功的请求数量 |  请求成功率 |  请求验证正确的请求数量  | 请求验证正确率 |
+        // |-----------|-------------|------------|-------------|-----------------|-----------|-----------------------|-------------|
+        // |   dev     |    成功     |      {}    |     100      |        100      |   100%    |      100              |   100%     ｜
+        // |-----------|-------------|------------|-------------|-----------------|-----------|-----------------------|-------------|
+        // 写 Excel
+        val overviewWriter = EasyExcel.write(response.outputStream).sheet("测试案例执行概览")
+        overviewWriter.doWrite(overviewTitle) // 写表头
+        overviewWriter.doWrite(overviewExcelData) // 写表格
+
+        // ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  ---
+
+        // 测试案例执行明细 表头
+        val detailTitle = listOf("编号", "请求名称", "HTTP 请求", "HTTP 响应", "保存环境变量", "响应验证信息", "响应验证结果")
+        // 测试案例执行明细 表格数据
+        val detailExcelData = testCaseExecuteService.detail(executeHistoryId)?.map {
             listOf(
                 it.id,
                 it.testCaseRequestName,
@@ -81,12 +112,6 @@ class TestCaseExecuteController {
                 it.execCheckResult
             )
         }
-
-        // 设置头
-        response.contentType = "application/vnd.ms-excel"
-        response.characterEncoding = "utf-8"
-        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${executeHistoryId}.xlsx")
-
         // |---------|-------------|--------------|--------------|---------------|-------------|--------------|
         // |   编号   |   请求名称   | HTTP 请求信息 | HTTP 响应信息  | 保存环境变量信息 |  响应验证信息 |  响应验证结果  |
         // |---------|-------------|--------------|--------------|---------------|--------------|--------------|
@@ -95,8 +120,8 @@ class TestCaseExecuteController {
         // |  2      |    李四      |      {}      |    {}        |      {}       |       {}      |     0       |
         // |---------|-------------|--------------|--------------|---------------|----------------|------- -----|
         // 写 Excel
-        val writer = EasyExcel.write(response.outputStream).sheet("sheet1")
-        writer.doWrite(title) // 写表头
-        writer.doWrite(excelData) // 写表格
+        val detailWriter = EasyExcel.write(response.outputStream).sheet("测试案例执行明细")
+        detailWriter.doWrite(detailTitle) // 写表头
+        detailWriter.doWrite(detailExcelData) // 写表格
     }
 }

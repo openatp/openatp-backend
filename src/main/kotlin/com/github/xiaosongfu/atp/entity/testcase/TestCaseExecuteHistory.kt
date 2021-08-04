@@ -24,6 +24,10 @@ data class TestCaseExecuteHistory(
     @Column(name = "execute_datetime")
     var executeDatetime: String,
 
+    @Schema(description = "项目服务器名称")
+    @Column(name = "project_server_name")
+    var projectServerName: String,
+
     @Schema(description = "执行状态")
     @Column(name = "execute_status")
     var executeStatus: Int,
@@ -36,11 +40,19 @@ data class TestCaseExecuteHistory(
     @Column(name = "requestT_total_count")
     var requestTotalCount: Int,
 
-    @Schema(description = "验证正确的请求数量")
+    @Schema(description = "请求成功的请求数量")
+    @Column(name = "request_success_count")
+    var requestSuccessCount: Int,
+
+    @Schema(description = "请求成功率")
+    @Column(name = "request_success_rate")
+    var requestSuccessRate: Double,
+
+    @Schema(description = "请求验证正确的请求数量")
     @Column(name = "request_check_correct_count")
     var requestCheckCorrectCount: Int,
 
-    @Schema(description = "验证正确率")
+    @Schema(description = "请求验证正确率")
     @Column(name = "request_check_correct_rate")
     var requestCheckCorrectRate: Double
 ) {
