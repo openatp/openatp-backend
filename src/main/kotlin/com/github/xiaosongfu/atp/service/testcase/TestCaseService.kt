@@ -17,7 +17,8 @@ class TestCaseService {
             TestCase(
                 projectId = projectId,
                 name = req.name,
-                type = req.type
+                type = req.type,
+                projectRequestId =  req.projectRequestId
             )
         )
     }
@@ -30,6 +31,8 @@ class TestCaseService {
         testCaseRepository.findByIdOrNull(testCaseId)?.apply {
             name = req.name
             type = req.type
+            projectRequestId = projectRequestId
+            // 更新测试案例的时不可以更新 projectRequestId 属性，因为不允许修改测试案例关联的请求
         }?.let {
             testCaseRepository.save(it)
         }

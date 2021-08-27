@@ -2,13 +2,18 @@ package com.github.xiaosongfu.atp.service.testcase.batchimport
 
 import com.github.xiaosongfu.atp.entity.testcase.TestCaseRequestExecCheck
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestResponseRepository
+import com.github.xiaosongfu.atp.repository.testcase.TestCaseRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRequestExecCheckRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRequestRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class ReplayTestCaseRequestBatchImportService {
+    @Autowired
+    private lateinit var testCaseRepository: TestCaseRepository
+
     @Autowired
     private lateinit var testCaseRequestRepository: TestCaseRequestRepository
 
@@ -19,9 +24,9 @@ class ReplayTestCaseRequestBatchImportService {
     private lateinit var projectRequestResponseRepository: ProjectRequestResponseRepository
 
     fun downloadTemplateExcel(testCaseId: Long): List<String>? {
-        return testCaseRequestRepository.findAllByTestCaseId(testCaseId)?.firstOrNull()?.let { testCaseRequest ->
+        return testCaseRepository.findByIdOrNull(testCaseId)?.projectRequestId?.let { projectRequestId ->
             // 读取请求的响应验证
-            projectRequestResponseRepository.findAllByRequestId(testCaseRequest.projectRequestId)?.map {
+            projectRequestResponseRepository.findAllByRequestId(projectRequestId)?.map {
                 it.fieldName
             }
         }

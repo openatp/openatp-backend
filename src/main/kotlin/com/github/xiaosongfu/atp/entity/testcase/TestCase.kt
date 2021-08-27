@@ -29,7 +29,11 @@ data class TestCase(
 
     @Schema(description = "测试案例类型 [pipeline replay benchmark]")
     @Column(name = "type")
-    var type: String
+    var type: String,
+
+    @Schema(description = "benchmark和replay类型的测试案例关联的唯一的项目请求 ID")
+    @Column(name = "project_request_id")
+    var projectRequestId: Long?
 ) {
     companion object {
         const val TEST_CASE_TYPE_BENCHMARK = "benchmark" // 性能：使用相同请求参数和相同响应验证的 一个请求 调用一个接口
