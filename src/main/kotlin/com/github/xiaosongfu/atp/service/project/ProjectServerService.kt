@@ -16,8 +16,8 @@ class ProjectServerService {
         projectServerRepository.save(
             ProjectServer(
                 projectId = projectId,
-                envName = req.envName,
-                baseUrl = req.baseUrl
+                serverName = req.serverName,
+                serverAddr = req.serverAddr
             )
         )
     }
@@ -28,8 +28,8 @@ class ProjectServerService {
 
     fun update(projectServerId: Long, req: ProjectServerInsertRequest) {
         projectServerRepository.findByIdOrNull(projectServerId)?.apply {
-            envName = req.envName
-            baseUrl = req.baseUrl
+            serverName = req.serverName
+            serverAddr = req.serverAddr
         }?.let {
             projectServerRepository.save(it)
         }

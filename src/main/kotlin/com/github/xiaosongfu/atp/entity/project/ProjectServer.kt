@@ -23,11 +23,11 @@ data class ProjectServer(
     @Column(name = "project_id")
     var projectId: Long,
 
-    @Schema(description = "环境名称")
-    @Column(name = "env_name")
-    var envName: String,
+    @Schema(description = "服务器名称")
+    @Column(name = "server_name")
+    var serverName: String,
 
-    @Schema(description = "base url,结尾不能有/")
-    @Column(name = "base_url")
-    var baseUrl: String
+    @Schema(description = "服务器地址,结尾不能有/")
+    @Column(name = "server_addr")
+    var serverAddr: String
 )
