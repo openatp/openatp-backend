@@ -25,8 +25,6 @@ class ReplayTestCaseRequestBatchImportController {
     @Autowired
     private lateinit var batchImportService: ReplayTestCaseRequestBatchImportService
 
-    private val log = LoggerFactory.getLogger(javaClass)
-
     @Operation(summary = "Replay类型测试案例请求批量导入excel模板下载")
     @GetMapping("/download_template/excel/{testCaseId}")
     fun downloadTemplateExcel(
@@ -52,7 +50,7 @@ class ReplayTestCaseRequestBatchImportController {
         // |  天气好  |    李四     |      17     |
         // |---------|-------------|------------|
         // 写 Excel
-        EasyExcel.write(response.outputStream).sheet("sheet1").doWrite(excelData)
+        EasyExcel.write(response.outputStream).sheet("sheet1").doWrite(listOf(excelData))
     }
 
     @Operation(summary = "Replay类型测试案例请求批量导入接口")
@@ -63,12 +61,6 @@ class ReplayTestCaseRequestBatchImportController {
     ): R<Unit> {
         // 读 Excel
         val excelData = EasyExcel.read(file.inputStream).sheet().doReadSync<Map<Int, String>>()
-
-        excelData.forEach { mapType ->
-            mapType.forEach { (t, u) ->
-                log.debug("$t : $u")
-            }
-        }
 
         // 开始导入
         batchImportService.batchImport(testCaseId, excelData)

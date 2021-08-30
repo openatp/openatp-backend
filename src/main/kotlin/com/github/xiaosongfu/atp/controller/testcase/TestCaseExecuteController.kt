@@ -70,9 +70,12 @@ class TestCaseExecuteController {
         response.contentType = "application/vnd.ms-excel"
         response.characterEncoding = "utf-8"
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${executeHistoryId}.xlsx")
+        // excel writer
+        val easyExcelWriter = EasyExcel.write(response.outputStream)
 
         // 测试案例执行概览 表头
-        val overviewTitle = listOf("执行时间", "服务器名称", "执行状态", "执行状态详情", "总的请求数量", "请求成功的请求数量", "请求成功率", "请求验证正确的请求数量", "请求验证正确率")
+        val overviewTitle =
+            listOf("执行时间", "服务器名称", "执行状态", "执行状态详情", "总的请求数量", "请求成功的请求数量", "请求成功率", "请求验证正确的请求数量", "请求验证正确率")
         // 测试案例执行概览 表格数据
         val overviewExcelData = testCaseExecuteService.find(executeHistoryId)?.let {
             listOf(
@@ -93,9 +96,8 @@ class TestCaseExecuteController {
         // |   dev     |    成功     |      {}    |     100      |        100      |   100%    |      100              |   100%     ｜
         // |-----------|-------------|------------|-------------|-----------------|-----------|-----------------------|-------------|
         // 写 Excel
-        val overviewWriter = EasyExcel.write(response.outputStream).sheet("测试案例执行概览")
-        overviewWriter.doWrite(overviewTitle) // 写表头
-        overviewWriter.doWrite(overviewExcelData) // 写表格
+        val overviewWriter = easyExcelWriter.sheet("测试案例执行概览")
+        overviewWriter.doWrite(listOf(overviewTitle, overviewExcelData)) // 表头+表格
 
         // ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  ---
 
@@ -121,8 +123,7 @@ class TestCaseExecuteController {
         // |  2      |    李四      |      {}      |    {}        |      {}       |       {}      |     0       |
         // |---------|-------------|--------------|--------------|---------------|----------------|------- -----|
         // 写 Excel
-        val detailWriter = EasyExcel.write(response.outputStream).sheet("测试案例执行明细")
-        detailWriter.doWrite(detailTitle) // 写表头
-        detailWriter.doWrite(detailExcelData) // 写表格
+        val detailWriter = easyExcelWriter.sheet("测试案例执行明细")
+        detailWriter.doWrite(listOf(detailTitle, detailExcelData)) // 表头+表格
     }
 }

@@ -5,6 +5,7 @@ import com.github.xiaosongfu.atp.repository.project.ProjectRequestResponseReposi
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRequestExecCheckRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRequestRepository
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -22,6 +23,8 @@ class ReplayTestCaseRequestBatchImportService {
 
     @Autowired
     private lateinit var projectRequestResponseRepository: ProjectRequestResponseRepository
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     fun downloadTemplateExcel(testCaseId: Long): List<String>? {
         return testCaseRepository.findByIdOrNull(testCaseId)?.projectRequestId?.let { projectRequestId ->
@@ -41,6 +44,8 @@ class ReplayTestCaseRequestBatchImportService {
             // 遍历并保存
             excelData.forEach { row ->
                 row.forEach { (index, value) ->
+                    log.debug("开始导入第 $index 行 : $value")
+
                     if (index == 0) {
                         if (value.isNotEmpty()) { // 要不为空才保存
                             val newTestCaseRequest = testCaseRequest.copy(param = value)

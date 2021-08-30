@@ -43,7 +43,7 @@ data class TestCaseExecuteDetail(
     @Column(name = "exec_check_result")
     var execCheckResult: Int,
 
-    @Schema(description = "测试案例 ID")
+    @Schema(description = "环境变量信息")
     @Column(name = "save_env_variable_info")
     var saveEnvVariableInfo: String?
 ) {
