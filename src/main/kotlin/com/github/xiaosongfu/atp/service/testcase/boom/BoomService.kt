@@ -50,7 +50,7 @@ class BoomService {
 
             // TAG :: 保存 测试案例执行记录 -> 开始执行就立即失败
             testCaseExecuteService.insertHistoryForStartAndDirectFailed(
-                "",
+                "[$projectServerId]",
                 executeSessionId,
                 testCaseId,
                 e.msg
@@ -98,28 +98,29 @@ class BoomService {
 
         // 保存执行结果到数据
         if (testCaseExecuteHistories != null) {
-            // 计算总的请求数、请求错误的请求数、请求验证成功的请求数
+            // 计算总的请求数
             val requestTotalCount = testCaseExecuteHistories.size
+            // 请求验证成功的请求数
             val requestCheckCorrectCount = testCaseExecuteHistories.count {
                 it.execCheckResult == TestCaseExecuteDetail.EXEC_CHECK_RESULT_CORRECT
             }
+            // 请求验证失败的请求数
+            val requestCheckWrongCount = testCaseExecuteHistories.count {
+                it.execCheckResult == TestCaseExecuteDetail.EXEC_CHECK_RESULT_WRONG
+            }
+            // 请求错误的请求数
             val requestErrorCount = testCaseExecuteHistories.count {
                 it.execCheckResult == TestCaseExecuteDetail.EXEC_CHECK_REQUEST_ERROR
             }
 
-            // 更新 测试案例执行记录
-            if (requestErrorCount != requestTotalCount) { // 不是所有的请求都错误就算执行成功
-                // TAG :: 更新 测试案例执行记录 -- 成功
-                testCaseExecuteService.updateHistoryForExecuteSuccess(
-                    executeSessionId,
-                    requestTotalCount,
-                    requestCheckCorrectCount,
-                    requestErrorCount
-                )
-            } else {
-                // TAG :: 更新 测试案例执行记录 -- 成功
-                testCaseExecuteService.updateHistoryForExecuteError(executeSessionId, "可能请求全都是失败")
-            }
+            // TAG :: 更新 测试案例执行记录 -- 成功
+            testCaseExecuteService.updateHistoryForExecuteSuccess(
+                executeSessionId,
+                requestTotalCount,
+                requestCheckCorrectCount,
+                requestCheckWrongCount,
+                requestErrorCount
+            )
             // 保存 测试案例执行记录详情
             testCaseExecuteService.insertDetails(testCaseExecuteHistories)
 

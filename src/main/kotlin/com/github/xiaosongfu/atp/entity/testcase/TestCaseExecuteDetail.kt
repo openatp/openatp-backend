@@ -28,28 +28,28 @@ data class TestCaseExecuteDetail(
     var testCaseRequestName: String,
 
     @Schema(description = "HTTP 请求")
-    @Column(name = "http_request")
+    @Column(name = "http_request", columnDefinition = "text NOT NULL")
     var httpRequest: String,
 
     @Schema(description = "HTTP 响应")
-    @Column(name = "http_response")
+    @Column(name = "http_response", columnDefinition = "text NOT NULL")
     var httpResponse: String,
 
     @Schema(description = "请求验证信息")
-    @Column(name = "exec_check_info")
+    @Column(name = "exec_check_info", columnDefinition = "text NOT NULL")
     var execCheckInfo: String?,
 
     @Schema(description = "请求验证结果")
-    @Column(name = "exec_check_result")
+    @Column(name = "exec_check_result", columnDefinition = "text NOT NULL")
     var execCheckResult: Int,
 
     @Schema(description = "环境变量信息")
-    @Column(name = "save_env_variable_info")
+    @Column(name = "save_env_variable_info", columnDefinition = "text NOT NULL")
     var saveEnvVariableInfo: String?
 ) {
     companion object {
-        const val EXEC_CHECK_REQUEST_ERROR = 0
-        const val EXEC_CHECK_RESULT_WRONG = 1
-        const val EXEC_CHECK_RESULT_CORRECT = 2
+        const val EXEC_CHECK_REQUEST_ERROR = 0  // HTTP请求错误
+        const val EXEC_CHECK_RESULT_WRONG = 1   // 验证失败
+        const val EXEC_CHECK_RESULT_CORRECT = 2 // 验证成功
     }
 }

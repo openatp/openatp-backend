@@ -1,5 +1,6 @@
 package com.github.xiaosongfu.atp.service.testcase.batchimport
 
+import com.github.xiaosongfu.atp.entity.testcase.TestCaseRequest
 import com.github.xiaosongfu.atp.entity.testcase.TestCaseRequestExecCheck
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestResponseRepository
 import com.github.xiaosongfu.atp.repository.testcase.TestCaseRepository
@@ -36,20 +37,30 @@ class ReplayTestCaseRequestBatchImportService {
     }
 
     fun batchImport(testCaseId: Long, excelData: List<Map<Int, String>>) {
-        testCaseRequestRepository.findAllByTestCaseId(testCaseId)?.firstOrNull()?.let { testCaseRequest ->
+        testCaseRepository.findByIdOrNull(testCaseId)?.projectRequestId?.let { projectRequestId ->
             // 读取请求的响应验证
-            val projectRequestResponseList =
-                projectRequestResponseRepository.findAllByRequestId(testCaseRequest.projectRequestId)
+            val projectRequestResponseList = projectRequestResponseRepository.findAllByRequestId(projectRequestId)
 
             // 遍历并保存
-            excelData.forEach { row ->
-                row.forEach { (index, value) ->
-                    log.debug("开始导入第 $index 行 : $value")
+            excelData.forEachIndexed { rowIndex, row ->
+                log.debug("开始导入第 $rowIndex 行 : $row")
 
+                // excel 一行是一条 '测试案例请求'，需要记住该ID用于插入 '测试案例请求验证配置'
+                var testCaseRequestIdForThisRow: Long = -1
+                // 遍历每一列
+                row.forEach { (index, value) ->
+                    log.debug("开始导入第 $index 列 : $value")
                     if (index == 0) {
                         if (value.isNotEmpty()) { // 要不为空才保存
-                            val newTestCaseRequest = testCaseRequest.copy(param = value)
-                            testCaseRequestRepository.save(newTestCaseRequest)
+                            val res = testCaseRequestRepository.save(
+                                TestCaseRequest(
+                                    testCaseId = testCaseId,
+                                    name = rowIndex.toString(),
+                                    projectRequestId = projectRequestId,
+                                    param = value
+                                )
+                            )
+                            testCaseRequestIdForThisRow = res.id
                         }
                     } else {
                         if (index <= (projectRequestResponseList?.size ?: 0)) {
@@ -57,7 +68,7 @@ class ReplayTestCaseRequestBatchImportService {
                                 if (value.isNotEmpty()) { // 要不为空才保存
                                     testCaseRequestExecCheckRepository.save(
                                         TestCaseRequestExecCheck(
-                                            testCaseRequestId = testCaseRequest.id,
+                                            testCaseRequestId = testCaseRequestIdForThisRow,
                                             projectRequestResponseId = projectRequestResponse.id,
                                             wantResponseFieldValue = value
                                         )

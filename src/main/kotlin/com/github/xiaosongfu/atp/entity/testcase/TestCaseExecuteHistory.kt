@@ -57,9 +57,8 @@ data class TestCaseExecuteHistory(
     var requestCheckCorrectRate: Double
 ) {
     companion object {
-        const val EXECUTE_STATUS_RUNNING = 0
-        const val EXECUTE_STATUS_ERROR = 1
-        const val EXECUTE_STATUS_FAILED = 2
-        const val EXECUTE_STATUS_SUCCESS = 3
+        const val EXECUTE_STATUS_RUNNING = 0 // 执行中
+        const val EXECUTE_STATUS_FAILED = 1  // 执行失败
+        const val EXECUTE_STATUS_SUCCESS = 2 // 执行成功
     }
 }

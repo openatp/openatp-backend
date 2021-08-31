@@ -35,6 +35,30 @@ class TestCaseExecuteService {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
+    // 保存 测试案例执行记录 -> 开始执行就立即失败
+    fun insertHistoryForStartAndDirectFailed(
+        projectServerName: String,
+        executeHistoryId: String,
+        testCaseId: Long,
+        executeErrorReason: String
+    ) {
+        testCaseExecuteHistoryRepository.save(
+            TestCaseExecuteHistory(
+                id = executeHistoryId,
+                testCaseId = testCaseId,
+                executeDatetime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                projectServerName = projectServerName,
+                executeStatus = TestCaseExecuteHistory.EXECUTE_STATUS_FAILED,
+                executeStatusDetail = executeErrorReason,
+                requestTotalCount = 0,
+                requestSuccessCount = 0,
+                requestSuccessRate = 0.0,
+                requestCheckCorrectCount = 0,
+                requestCheckCorrectRate = 0.0
+            )
+        )
+    }
+
     // 保存 测试案例执行记录 -> 开始执行状态
     fun insertHistoryForStartRunning(projectServerName: String, executeHistoryId: String, testCaseId: Long) {
         testCaseExecuteHistoryRepository.save(
@@ -53,50 +77,34 @@ class TestCaseExecuteService {
         )
     }
 
-    // 保存 测试案例执行记录 -> 开始执行就立即失败
-    fun insertHistoryForStartAndDirectFailed(projectServerName: String, executeHistoryId: String, testCaseId: Long, executeErrorReason: String) {
-        testCaseExecuteHistoryRepository.save(
-            TestCaseExecuteHistory(
-                id = executeHistoryId,
-                testCaseId = testCaseId,
-                executeDatetime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                projectServerName = projectServerName,
-                executeStatus = TestCaseExecuteHistory.EXECUTE_STATUS_FAILED,
-                requestTotalCount = 0,
-                requestSuccessCount = 0,
-                requestSuccessRate = 0.0,
-                requestCheckCorrectCount = 0,
-                requestCheckCorrectRate = 0.0
-            )
-        )
-    }
+    // --- --- ---
 
     // 更新 测试案例执行记录 -> 执行成功状态
-    fun updateHistoryForExecuteSuccess(executeHistoryId: String, requestTotalCount: Int, requestCheckCorrectCount: Int, requestErrorCount: Int) {
+    fun updateHistoryForExecuteSuccess(
+        executeHistoryId: String,
+        requestTotalCount: Int,
+        requestCheckCorrectCount: Int,
+        requestCheckWrongCount: Int,
+        requestErrorCount: Int
+    ) {
         testCaseExecuteHistoryRepository.findByIdOrNull(executeHistoryId)?.let {
             // 计算 请求验证正确率
-            val requestCheckCorrectRate = requestCheckCorrectCount.toDouble() / (requestTotalCount - requestErrorCount).toDouble()
-            // 计算 请求成功率
-            val requestSuccessRate = (requestTotalCount - requestErrorCount).toDouble() / requestTotalCount.toDouble()
+            val requestCheckCorrectRate =
+                requestCheckCorrectCount.toDouble() / (requestCheckCorrectCount + requestCheckWrongCount).toDouble()
+
+            // 计算 请求成功数和请求成功率
+            val requestSuccessCount = requestTotalCount - requestErrorCount
+            val requestSuccessRate = requestSuccessCount.toDouble() / requestTotalCount.toDouble()
+
             // 更新
             testCaseExecuteHistoryRepository.save(
                 it.copy(
                     executeStatus = TestCaseExecuteHistory.EXECUTE_STATUS_SUCCESS,
                     requestTotalCount = requestTotalCount,
+                    requestSuccessCount = requestSuccessCount,
+                    requestSuccessRate = requestSuccessRate,
                     requestCheckCorrectCount = requestCheckCorrectCount,
                     requestCheckCorrectRate = requestCheckCorrectRate
-                )
-            )
-        }
-    }
-
-    // 更新 测试案例执行记录 -> 执行错误状态
-    fun updateHistoryForExecuteError(executeHistoryId: String, executeErrorReason: String) {
-        testCaseExecuteHistoryRepository.findByIdOrNull(executeHistoryId)?.let {
-            testCaseExecuteHistoryRepository.save(
-                it.copy(
-                    executeStatus = TestCaseExecuteHistory.EXECUTE_STATUS_ERROR,
-                    executeStatusDetail = executeErrorReason
                 )
             )
         }
@@ -113,6 +121,8 @@ class TestCaseExecuteService {
             )
         }
     }
+
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
     // 保存 测试案例执行记录详情
     fun insertDetails(details: List<TestCaseExecuteDetail>) {
