@@ -139,7 +139,7 @@ class BoomService {
     ): List<TestCaseExecuteDetail> {
         // 切割请求参数
         val testCaseRequestParams = benchmark.request.param?.split("##") ?: emptyList()
-        log.debug("$executeSessionId :: 请求参数 $testCaseRequestParams")
+        log.debug("$executeSessionId :: 请求[${benchmark.request.name}]的请求参数:$testCaseRequestParams")
 
         // 替换占位变量
         replaceParamBox.replacePositionAndEnvParams(
@@ -172,7 +172,7 @@ class BoomService {
                 // 执行响应验证
                 val execCheckInfo = benchmark.execCheck?.mapNotNull { check ->
                     val fieldValue = ctx.read<Any>(check.fieldPath)
-                    log.debug("$executeSessionId :: 执行响应验证 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
+                    log.debug("$executeSessionId :: 执行 HTTP 请求[${benchmark.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
 
                     // 判断验证是否成功
                     if (fieldValue != null) {
@@ -190,7 +190,7 @@ class BoomService {
                 // 执行保存环境变量
                 val saveEnvVariableInfo = benchmark.saveEnvVariable?.mapNotNull { saveEnvVariable ->
                     val variableValue = ctx.read<Any>(saveEnvVariable.projectEnvVariableValuePath)
-                    log.debug("$executeSessionId :: 执行保存环境变量 变量名称[${saveEnvVariable.variableName}] 默认值[${saveEnvVariable.defaultValue}] 实际值[$variableValue]")
+                    log.debug("$executeSessionId :: 执行 HTTP 请求[${benchmark.request.name}]的保存环境变量: 变量名称[${saveEnvVariable.variableName}] 默认值[${saveEnvVariable.defaultValue}] 实际值[$variableValue]")
 
                     // 保存环境变量
                     if (variableValue != null) {
@@ -242,7 +242,7 @@ class BoomService {
         return replay.requests.map { bundle ->
             // 切割请求参数
             val testCaseRequestParams = bundle.request.param?.split("##") ?: emptyList()
-            log.debug("$executeSessionId :: 请求参数 $testCaseRequestParams")
+            log.debug("$executeSessionId :: 请求[${bundle.request.name}]的请求参数:$testCaseRequestParams")
 
             // 替换占位变量后会修改 replay.fetchApi 所以这里需要使用它的一个副本
             val willModifiedFetchApi = replay.fetchApi.copy()
@@ -274,7 +274,7 @@ class BoomService {
                 // 执行响应验证
                 val execCheckInfo = bundle.execCheck?.mapNotNull { check ->
                     val fieldValue = ctx.read<Any>(check.fieldPath)
-                    log.debug("$executeSessionId :: 执行响应验证 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
+                    log.debug("$executeSessionId :: 执行 HTTP 请求[${bundle.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
 
                     // 判断验证是否成功
                     if (fieldValue != null) {
@@ -292,7 +292,7 @@ class BoomService {
                 // 执行保存环境变量
                 val saveEnvVariableInfo = bundle.saveEnvVariable?.mapNotNull { saveEnvVariable ->
                     val variableValue = ctx.read<Any>(saveEnvVariable.projectEnvVariableValuePath)
-                    log.debug("$executeSessionId :: 执行保存环境变量 变量名称[${saveEnvVariable.variableName}] 默认值[${saveEnvVariable.defaultValue}] 实际值[$variableValue]")
+                    log.debug("$executeSessionId :: 执行 HTTP 请求[${bundle.request.name}]的保存环境变量: 变量名称[${saveEnvVariable.variableName}] 默认值[${saveEnvVariable.defaultValue}] 实际值[$variableValue]")
 
                     // 保存环境变量
                     if (variableValue != null) {
@@ -340,7 +340,102 @@ class BoomService {
         executeSessionId: String,
         pipeline: BoomVO.Pipeline
     ): List<TestCaseExecuteDetail> {
-        TODO()
+        // 遍历并执行每个请求
+        return pipeline.requests.map { bundle ->
+            // 切割请求参数
+            val testCaseRequestParams = bundle.request.param?.split("##") ?: emptyList()
+            log.debug("$executeSessionId :: HTTP 请求[${bundle.request.name}]的请求参数:$testCaseRequestParams")
+
+            // 替换占位变量
+            replaceParamBox.replacePositionAndEnvParams(
+                bundle.fetchApi,
+                testCaseRequestParams,
+                BoomStore.readEnvs(executeSessionId)
+            )
+
+            // 封装 http 请求
+            val httpRequest = HttpRequest(
+                url = bundle.fetchApi.url,
+                method = bundle.fetchApi.method,
+                contentType = bundle.fetchApi.contentType ?: ProjectRequest.ContentType.FORM,
+                header = bundle.fetchApi.header?.let {
+                    objectMapper.readValue(it, object : TypeReference<HashMap<String, String>>() {})
+                },
+                param = bundle.fetchApi.param?.let {
+                    objectMapper.readValue(it, object : TypeReference<HashMap<String, Any>>() {})
+                }
+            )
+
+            // 执行 http 请求
+            val httpResponse = httpBox.doHttp(executeSessionId, httpRequest)
+            log.debug("$executeSessionId :: HTTP 请求[${bundle.request.name}]的响应结果 $httpResponse")
+
+            // 处理 http 响应
+            if (httpResponse.code == 200) { // ---> 请求成功
+                val ctx = JsonPath.parse(httpResponse.body)
+                // 执行响应验证
+                val execCheckInfo = bundle.execCheck?.mapNotNull { check ->
+                    val fieldValue = ctx.read<Any>(check.fieldPath)
+                    log.debug("$executeSessionId :: 执行 HTTP 请求[${bundle.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
+
+                    // 判断验证是否成功
+                    if (fieldValue != null) {
+                        // xx
+                        ExecCheckInfo(
+                            fieldName = check.fieldName,
+                            wantFieldValue = check.wantFieldValue,
+                            gotFieldValue = fieldValue.toString(),
+                            checkResult = fieldValue.toString() == check.wantFieldValue
+                        )
+                    } else {
+                        null
+                    }
+                }
+                // 执行保存环境变量
+                val saveEnvVariableInfo = bundle.saveEnvVariable?.mapNotNull { saveEnvVariable ->
+                    val variableValue = ctx.read<Any>(saveEnvVariable.projectEnvVariableValuePath)
+                    log.debug("$executeSessionId :: 执行 HTTP 请求[${bundle.request.name}]的保存环境变量: 变量名称[${saveEnvVariable.variableName}] 默认值[${saveEnvVariable.defaultValue}] 实际值[$variableValue]")
+
+                    // 保存环境变量
+                    if (variableValue != null) {
+                        BoomStore.saveEnv(executeSessionId, saveEnvVariable.variableName, variableValue.toString())
+                        // xx
+                        SaveEnvVariableInfo(
+                            variableName = saveEnvVariable.variableName,
+                            variableValue = variableValue.toString()
+                        )
+                    } else {
+                        null
+                    }
+                }
+
+                // 转换
+                TestCaseExecuteDetail(
+                    executeHistoryId = executeSessionId,
+                    testCaseRequestName = bundle.request.name,
+                    httpRequest = objectMapper.writeValueAsString(httpRequest),
+                    httpResponse = objectMapper.writeValueAsString(httpResponse),
+                    execCheckInfo = objectMapper.writeValueAsString(execCheckInfo),
+                    execCheckResult = if (execCheckInfo?.all { it.checkResult } == true) {
+                        TestCaseExecuteDetail.EXEC_CHECK_RESULT_CORRECT
+                    } else {
+                        TestCaseExecuteDetail.EXEC_CHECK_RESULT_WRONG
+                    },
+                    saveEnvVariableInfo = objectMapper.writeValueAsString(saveEnvVariableInfo)
+                )
+            } else { // ---> 请求错误
+                // 转换
+                TestCaseExecuteDetail(
+                    executeHistoryId = executeSessionId,
+                    testCaseRequestName = bundle.request.name,
+                    httpRequest = objectMapper.writeValueAsString(httpRequest),
+                    httpResponse = objectMapper.writeValueAsString(httpResponse),
+                    execCheckInfo = null,
+                    execCheckResult = TestCaseExecuteDetail.EXEC_CHECK_REQUEST_ERROR,
+                    saveEnvVariableInfo = null
+                )
+            }
+        }
     }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
