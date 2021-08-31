@@ -19,19 +19,19 @@ class ReplaceParamBox {
         envs: HashMap<String, String>
     ) {
         // http.url
-        fetchApi.url = replacePositionParams(fetchApi.url, testCaseRequestParams)
-        fetchApi.url = replaceEnvParams(fetchApi.url, envs)
+        val urlTemp = replacePositionParams(fetchApi.url, testCaseRequestParams)
+        fetchApi.url = replaceEnvParams(urlTemp, envs)
 
         // http.header
         fetchApi.header?.let {
-            fetchApi.header = replacePositionParams(it, testCaseRequestParams)
-            fetchApi.header = replaceEnvParams(it, envs)
+            val headerTemp = replacePositionParams(it, testCaseRequestParams)
+            fetchApi.header = replaceEnvParams(headerTemp, envs)
         }
 
         // http.param
         fetchApi.param?.let {
-            fetchApi.param = replacePositionParams(it, testCaseRequestParams)
-            fetchApi.param = replaceEnvParams(it, envs)
+            val paramTemp = replacePositionParams(it, testCaseRequestParams)
+            fetchApi.param = replaceEnvParams(paramTemp, envs)
         }
     }
 

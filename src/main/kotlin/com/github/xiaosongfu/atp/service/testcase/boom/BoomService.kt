@@ -149,22 +149,29 @@ class BoomService {
             // STEP 1: 准备并发起 HTTP 请求
             val testCaseRequestParams = bundle.request.param?.split("##") ?: emptyList() // 切割请求参数
             log.debug("$executeSessionId :: 请求参数 $testCaseRequestParams")
+
+            // 替换占位变量后会修改 replay.fetchApi 所以这里需要使用它的一个副本
+            val willModifiedFetchApi = replay.fetchApi.copy()
+            // 替换占位变量
             replaceParamBox.replacePositionAndEnvParams(
-                replay.fetchApi,
+                willModifiedFetchApi, // ！使用 replay.fetchApi 的副本！
                 testCaseRequestParams,
                 BoomStore.readEnvs(executeSessionId)
-            ) // 替换占位变量
+            )
+
+            // 封装 http 请求
             val httpRequest = HttpRequest(
-                url = replay.fetchApi.url,
+                url = willModifiedFetchApi.url, // ！使用副本被替换后的值！
                 method = replay.fetchApi.method,
                 contentType = replay.fetchApi.contentType ?: ProjectRequest.ContentType.FORM,
-                header = replay.fetchApi.header?.let {
+                header = willModifiedFetchApi.header?.let { // ！使用副本被替换后的值！
                     objectMapper.readValue(it, object : TypeReference<HashMap<String, String>>() {})
                 },
-                param = replay.fetchApi.param?.let {
+                param = willModifiedFetchApi.param?.let { // ！使用副本被替换后的值！
                     objectMapper.readValue(it, object : TypeReference<HashMap<String, Any>>() {})
                 }
             )
+            // 执行 http 请求
             val httpResponse = httpBox.doHttp(executeSessionId, httpRequest)
             log.debug("$executeSessionId :: HTTP 请求[${bundle.request.name}]的响应结果 $httpResponse")
             // 请求成功

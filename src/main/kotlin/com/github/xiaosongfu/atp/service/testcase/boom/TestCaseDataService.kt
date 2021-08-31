@@ -61,22 +61,22 @@ class TestCaseDataService {
                 ?: throw ServiceException(msg = "要执行的项目服务器不存在")
             val projectEnvVariableList = projectEnvVariableRepository.findAllByProjectId(projectId)
 
-            // TODO 没有数据时 findAllByTestCaseId() 居然不返回 null 而是空数组 !!!
-//            testCaseRequestRepository.findAllByTestCaseId(testCaseId)?.let { testCaseRequests ->
             val testCaseRequests = testCaseRequestRepository.findAllByTestCaseId(testCaseId)
+            // 没有数据时 findAllByTestCaseId() 居然不返回 null 而是空数组 !!!
             if (testCaseRequests != null && testCaseRequests.isNotEmpty()) {
                 when (testCase.type) {
                     // 1
                     TestCase.TEST_CASE_TYPE_BENCHMARK -> {
-                        // benchmark 只需要一个请求
-                        val testCaseRequest = testCaseRequests.first()
-
-                        // p2 读取 project-request project-request-response 的数据
-                        val projectRequest = projectRequestRepository.findByIdOrNull(testCaseRequest.projectRequestId)
+                        // p2 读取 project-request project-request-response 的数据 --- benchmark 只关联一个请求所以不需要遍历
+                        val projectRequest = projectRequestRepository.findByIdOrNull(testCase.projectRequestId!!)
                             ?: throw ServiceException(msg = "要执行的项目请求不存在")
                         val projectRequestResponseList =
-                            projectRequestResponseRepository.findAllByRequestId(testCaseRequest.projectRequestId)
+                            projectRequestResponseRepository.findAllByRequestId(testCase.projectRequestId!!)
 
+                        // p3 读取 TestCaseRequest 的信息 --- benchmark 只有一个 TestCaseRequest 所以不需要遍历
+                        //
+                        // benchmark 只有一个 TestCaseRequest
+                        val testCaseRequest = testCaseRequests.first()
                         // ExecCheck
                         val execCheck =
                             testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(testCaseRequest.id)
@@ -90,7 +90,6 @@ class TestCaseDataService {
                                             )
                                         }
                                 }
-
                         // SaveEnvVariable
                         val saveEnvVariable =
                             testCaseRequestSaveEnvVariableRepository.findAllByTestCaseRequestId(testCaseRequest.id)
@@ -134,47 +133,44 @@ class TestCaseDataService {
                     }
                     // 2
                     TestCase.TEST_CASE_TYPE_REPLAY -> {
-                        // replay 所有请求都是调用同一个接口 !!!
-                        val theSameTestCaseRequest = testCaseRequests.first()
-
-                        // --1 replay 所有请求都是调用同一个接口，所以下面的数据只需要一份
-                        // p2 读取 project-request project-request-response 的数据
+                        // p2 读取 project-request project-request-response 的数据 --- replay 只关联一个请求所以不需要遍历
                         val projectRequest =
-                            projectRequestRepository.findByIdOrNull(theSameTestCaseRequest.projectRequestId)
+                            projectRequestRepository.findByIdOrNull(testCase.projectRequestId!!)
                                 ?: throw ServiceException(msg = "要执行的项目请求不存在")
                         val projectRequestResponseList =
-                            projectRequestResponseRepository.findAllByRequestId(theSameTestCaseRequest.projectRequestId)
+                            projectRequestResponseRepository.findAllByRequestId(testCase.projectRequestId!!)
 
-                        // --2 replay 所有请求都是调用同一个接口，所以 ExecCheck 只需要一份
-                        val execCheck =
-                            testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(theSameTestCaseRequest.id)
-                                ?.mapNotNull { check ->
-                                    projectRequestResponseList?.firstOrNull { it.id == check.projectRequestResponseId }
-                                        ?.let { resp ->
-                                            BoomVO.ExecCheck(
-                                                fieldName = resp.fieldName,
-                                                fieldPath = resp.fieldPath,
-                                                wantFieldValue = check.wantResponseFieldValue
-                                            )
-                                        }
-                                }
-
-                        // --3 replay 所有请求都是调用同一个接口，所以 SaveEnvVariable 只需要一份
-                        val saveEnvVariable =
-                            testCaseRequestSaveEnvVariableRepository.findAllByTestCaseRequestId(theSameTestCaseRequest.id)
-                                ?.mapNotNull { saveEnvVar ->
-                                    projectEnvVariableList?.firstOrNull { it.id == saveEnvVar.projectEnvVariableId }
-                                        ?.let { envVar ->
-                                            BoomVO.SaveEnvVariable(
-                                                variableName = envVar.variableName,
-                                                defaultValue = envVar.defaultValue,
-                                                projectEnvVariableValuePath = saveEnvVar.projectEnvVariableValuePath
-                                            )
-                                        }
-                                }
-
-                        // 遍历所以请求
+                        // p3 读取 TestCaseRequest 的信息 --- replay 需要遍历
+                        //
+                        // 遍历所有请求
                         val requests = testCaseRequests.map { testCaseRequest ->
+                            // ExecCheck
+                            val execCheck =
+                                testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(testCaseRequest.id)
+                                    ?.mapNotNull { check ->
+                                        projectRequestResponseList?.firstOrNull { it.id == check.projectRequestResponseId }
+                                            ?.let { resp ->
+                                                BoomVO.ExecCheck(
+                                                    fieldName = resp.fieldName,
+                                                    fieldPath = resp.fieldPath,
+                                                    wantFieldValue = check.wantResponseFieldValue
+                                                )
+                                            }
+                                    }
+                            // SaveEnvVariable
+                            val saveEnvVariable =
+                                testCaseRequestSaveEnvVariableRepository.findAllByTestCaseRequestId(testCaseRequest.id)
+                                    ?.mapNotNull { saveEnvVar ->
+                                        projectEnvVariableList?.firstOrNull { it.id == saveEnvVar.projectEnvVariableId }
+                                            ?.let { envVar ->
+                                                BoomVO.SaveEnvVariable(
+                                                    variableName = envVar.variableName,
+                                                    defaultValue = envVar.defaultValue,
+                                                    projectEnvVariableValuePath = saveEnvVar.projectEnvVariableValuePath
+                                                )
+                                            }
+                                    }
+
                             // 单个请求封装
                             BoomVO.Replay.Bundle(
                                 request = BoomVO.Request(
@@ -212,13 +208,15 @@ class TestCaseDataService {
                     TestCase.TEST_CASE_TYPE_PIPELINE -> {
                         // 遍历所以请求
                         val requests = testCaseRequests.map { testCaseRequest ->
-                            // p2 读取 project-request project-request-response 的数据
+                            // p2 读取 project-request project-request-response 的数据 --- pipeline 关联的请求各不相同，所以各自获取
                             val projectRequest =
                                 projectRequestRepository.findByIdOrNull(testCaseRequest.projectRequestId)
                                     ?: throw ServiceException(msg = "要执行的项目请求不存在")
                             val projectRequestResponseList =
                                 projectRequestResponseRepository.findAllByRequestId(testCaseRequest.projectRequestId)
 
+                            // p3 读取 TestCaseRequest 的信息 --- pipeline 需要遍历
+                            //
                             // ExecCheck
                             val execCheck =
                                 testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(testCaseRequest.id)
@@ -232,7 +230,6 @@ class TestCaseDataService {
                                                 )
                                             }
                                     }
-
                             // SaveEnvVariable
                             val saveEnvVariable =
                                 testCaseRequestSaveEnvVariableRepository.findAllByTestCaseRequestId(testCaseRequest.id)
