@@ -5,7 +5,9 @@ import com.github.xiaosongfu.atp.domain.dto.project.ProjectRequestInsertRequest
 import com.github.xiaosongfu.atp.domain.vo.project.ProjectRequestResponseVO
 import com.github.xiaosongfu.atp.domain.vo.project.ProjectRequestVO
 import com.github.xiaosongfu.atp.entity.project.ProjectRequest
+import com.github.xiaosongfu.atp.entity.project.ProjectRequestArgument
 import com.github.xiaosongfu.atp.entity.project.ProjectRequestResponse
+import com.github.xiaosongfu.atp.repository.project.ProjectRequestArgumentRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestRepository
 import com.github.xiaosongfu.atp.repository.project.ProjectRequestResponseRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional
 class ProjectRequestService {
     @Autowired
     private lateinit var projectRequestRepository: ProjectRequestRepository
+
+    @Autowired
+    private lateinit var projectRequestArgumentRepository: ProjectRequestArgumentRepository
 
     @Autowired
     private lateinit var projectRequestResponseRepository: ProjectRequestResponseRepository
@@ -36,6 +41,16 @@ class ProjectRequestService {
             )
         )
 
+        req.arguments?.forEach {
+            projectRequestArgumentRepository.save(
+                ProjectRequestArgument(
+                    projectId = projectId,
+                    requestId = request.id,
+                    argumentName = it
+                )
+            )
+        }
+
         req.responseFieldValidate?.forEach { resp ->
             projectRequestResponseRepository.save(
                 ProjectRequestResponse(
@@ -51,6 +66,7 @@ class ProjectRequestService {
     @Transactional
     fun delete(projectRequestId: Long) {
         projectRequestRepository.deleteById(projectRequestId)
+        projectRequestArgumentRepository.deleteAllByRequestId(projectRequestId)
         projectRequestResponseRepository.deleteAllByRequestId(projectRequestId)
     }
 
@@ -69,6 +85,8 @@ class ProjectRequestService {
                 )
             }
 
+            val arguments = projectRequestArgumentRepository.findAllByRequestId(req.id)?.map { it.argumentName }
+
             ProjectRequestFindResponse(
                 id = req.id,
                 request = ProjectRequestVO(
@@ -80,7 +98,8 @@ class ProjectRequestService {
                     header = req.header,
                     timeout = req.timeout
                 ),
-                responseFieldValidate = responseFieldValidate
+                responseFieldValidate = responseFieldValidate,
+                arguments = arguments
             )
         }
     }
@@ -101,6 +120,8 @@ class ProjectRequestService {
                 )
             }
 
+            val arguments = projectRequestArgumentRepository.findAllByRequestId(req.id)?.map { it.argumentName }
+
             ProjectRequestFindResponse(
                 id = req.id,
                 request = ProjectRequestVO(
@@ -112,7 +133,8 @@ class ProjectRequestService {
                     header = req.header,
                     timeout = req.timeout
                 ),
-                responseFieldValidate = responseFieldValidate
+                responseFieldValidate = responseFieldValidate,
+                arguments = arguments
             )
         }
     }

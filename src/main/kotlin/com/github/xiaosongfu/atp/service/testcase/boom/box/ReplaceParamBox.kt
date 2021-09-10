@@ -6,47 +6,47 @@ import org.springframework.stereotype.Service
 @Service
 class ReplaceParamBox {
 
-    // 替换位置参数和环境变量参数
+    // 替换Arg参数和Env参数
     //
     // http.url http.header http.param
     //
-    // PositionParam : $[0]
+    // ArgParam : $[签名]
     // EnvParam : ${姓名}
     //
-    fun replacePositionAndEnvParams(
+    fun replaceArgAndEnvParams(
         fetchApi: BoomVO.FetchApi,
-        testCaseRequestParams: List<String>,
+        args: HashMap<String, String>,
         envs: HashMap<String, String>
     ) {
         // http.url
-        val urlTemp = replacePositionParams(fetchApi.url, testCaseRequestParams)
+        val urlTemp = replaceArgParams(fetchApi.url, args)
         fetchApi.url = replaceEnvParams(urlTemp, envs)
 
         // http.header
         fetchApi.header?.let {
-            val headerTemp = replacePositionParams(it, testCaseRequestParams)
+            val headerTemp = replaceArgParams(it, args)
             fetchApi.header = replaceEnvParams(headerTemp, envs)
         }
 
         // http.param
         fetchApi.param?.let {
-            val paramTemp = replacePositionParams(it, testCaseRequestParams)
+            val paramTemp = replaceArgParams(it, args)
             fetchApi.param = replaceEnvParams(paramTemp, envs)
         }
     }
 
-    // 替换位置参数
-    private fun replacePositionParams(source: String, testCaseRequestParams: List<String>): String {
+    // 替换Arg参数
+    private fun replaceArgParams(source: String, args: HashMap<String, String>): String {
         var result = source
 
-        testCaseRequestParams.forEachIndexed { index, param ->
-            result = result.replace("\$[${index}]", param) // PositionParam : $[0]
+        args.forEach { arg ->
+            result = result.replace("\$[${arg.key}]", arg.value) // PositionParam : $[签名]
         }
 
         return result
     }
 
-    // 替换环境变量参数
+    // 替换Env参数
     private fun replaceEnvParams(source: String, envs: HashMap<String, String>): String {
         var result = source
 

@@ -11,5 +11,8 @@ data class ProjectRequestInsertRequest(
     var request: ProjectRequestVO,
 
     @Schema(description = "响应字段验证")
-    var responseFieldValidate: List<ProjectRequestResponseVO>?
+    var responseFieldValidate: List<ProjectRequestResponseVO>?,
+
+    @Schema(description = "参数")
+    var arguments: List<String>?
 )

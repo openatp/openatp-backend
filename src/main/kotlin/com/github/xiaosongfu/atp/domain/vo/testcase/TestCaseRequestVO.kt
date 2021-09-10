@@ -13,6 +13,6 @@ data class TestCaseRequestVO(
     @Positive(message = "必须为数字")
     var projectRequestId: Long,
 
-    @Schema(description = "请求参数")
-    var param: String? = null
+    @Schema(description = "参数")
+    var arguments: String? = null
 )

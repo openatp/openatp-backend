@@ -31,7 +31,7 @@ data class TestCaseRequest(
     @Column(name = "project_request_id")
     var projectRequestId: Long,
 
-    @Schema(description = "请求参数")
-    @Column(name = "param")
-    var param: String? = null
+    @Schema(description = "参数 HashMap 转换成的 json 字符串")
+    @Column(name = "arguments")
+    var arguments: String? = null
 )

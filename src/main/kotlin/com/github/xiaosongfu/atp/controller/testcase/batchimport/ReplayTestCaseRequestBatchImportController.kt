@@ -6,7 +6,6 @@ import com.github.xiaosongfu.jakarta.dto.R
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.GetMapping
@@ -32,9 +31,12 @@ class ReplayTestCaseRequestBatchImportController {
         response: HttpServletResponse
     ) {
         // 准备 sheet 头
-        val excelData = mutableListOf("请求参数")
+        val excelData = mutableListOf<String>()
+        batchImportService.downloadTemplateExcel2(testCaseId)?.map { arg ->
+            excelData.add("${ReplayTestCaseRequestBatchImportService.xx}$arg")
+        }
         batchImportService.downloadTemplateExcel(testCaseId)?.map { check ->
-            excelData.add("响应验证-$check")
+            excelData.add("${ReplayTestCaseRequestBatchImportService.yy}$check")
         }
 
         // 设置头
@@ -42,13 +44,13 @@ class ReplayTestCaseRequestBatchImportController {
         response.characterEncoding = "utf-8"
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${testCaseId}.xlsx")
 
-        // |---------|-------------|------------|
-        // | 请求参数 | 响应验证-姓名 | 响应验证-年龄 |
-        // |---------|-------------|------------|
-        // |  你好啊  |    张三     |      19     |
-        // |---------|-------------|------------|
-        // |  天气好  |    李四     |      17     |
-        // |---------|-------------|------------|
+        // |-------------|-------------|-------------|------------|
+        // | 请求参数-内容 | 请求参数-类型 | 响应验证-姓名 | 响应验证-年龄|
+        // |-------------|-------------|-------------|------------|
+        // |    你好啊    |     单纯     |    张三     |      19    |
+        // |-------------|-------------|-------------|------------|
+        // |    天气好    |     单车     |    李四     |      17    |
+        // |-------------|-------------|-------------|------------|
         // 写 Excel
         EasyExcel.write(response.outputStream).sheet("sheet1").doWrite(listOf(excelData))
     }

@@ -34,7 +34,7 @@ class TestCaseRequestService {
                 testCaseId = testCaseId,
                 name = req.request.name,
                 projectRequestId = req.request.projectRequestId,
-                param = req.request.param
+                arguments = req.request.arguments
             )
         )
 
@@ -96,7 +96,7 @@ class TestCaseRequestService {
                 request = TestCaseRequestVO(
                     name = req.name,
                     projectRequestId = req.projectRequestId,
-                    param = req.param
+                    arguments = req.arguments
                 ),
                 requestExecCheck = requestExecCheck,
                 requestSaveEnvVariable = requestSaveEnvVariable
@@ -132,7 +132,7 @@ class TestCaseRequestService {
                 request = TestCaseRequestVO(
                     name = req.name,
                     projectRequestId = req.projectRequestId,
-                    param = req.param
+                    arguments = req.arguments
                 ),
                 requestExecCheck = requestExecCheck,
                 requestSaveEnvVariable = requestSaveEnvVariable

@@ -117,7 +117,7 @@ class TestCaseDataService {
                             ),
                             request = BoomVO.Request(
                                 name = testCaseRequest.name,
-                                param = testCaseRequest.param
+                                arguments = testCaseRequest.arguments
                             ),
                             execCheck = execCheck,
                             saveEnvVariable = saveEnvVariable
@@ -175,7 +175,7 @@ class TestCaseDataService {
                             BoomVO.Replay.Bundle(
                                 request = BoomVO.Request(
                                     name = testCaseRequest.name,
-                                    param = testCaseRequest.param
+                                    arguments = testCaseRequest.arguments
                                 ),
                                 execCheck = execCheck,
                                 saveEnvVariable = saveEnvVariable
@@ -257,7 +257,7 @@ class TestCaseDataService {
                                 ),
                                 request = BoomVO.Request(
                                     name = testCaseRequest.name,
-                                    param = testCaseRequest.param
+                                    arguments = testCaseRequest.arguments
                                 ),
                                 execCheck = execCheck,
                                 saveEnvVariable = saveEnvVariable

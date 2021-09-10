@@ -137,14 +137,18 @@ class BoomService {
         executeSessionId: String,
         benchmark: BoomVO.Benchmark
     ): List<TestCaseExecuteDetail> {
-        // 切割请求参数
-        val testCaseRequestParams = benchmark.request.param?.split("##") ?: emptyList()
-        log.debug("$executeSessionId :: 请求[${benchmark.request.name}]的请求参数:$testCaseRequestParams")
+        // 解析请求参数
+        val args: HashMap<String, String> = benchmark.request.arguments?.let {
+            objectMapper.readValue(
+                it,
+                object : TypeReference<HashMap<String, String>>() {})
+        } ?: hashMapOf()
+        log.debug("$executeSessionId :: 请求[${benchmark.request.name}]的请求参数:${benchmark.request.arguments}")
 
         // 替换占位变量
-        replaceParamBox.replacePositionAndEnvParams(
+        replaceParamBox.replaceArgAndEnvParams(
             benchmark.fetchApi,
-            testCaseRequestParams,
+            args,
             BoomStore.readEnvs(executeSessionId)
         )
 
@@ -240,16 +244,20 @@ class BoomService {
     ): List<TestCaseExecuteDetail> {
         // 遍历并执行每个请求
         return replay.requests.map { bundle ->
-            // 切割请求参数
-            val testCaseRequestParams = bundle.request.param?.split("##") ?: emptyList()
-            log.debug("$executeSessionId :: 请求[${bundle.request.name}]的请求参数:$testCaseRequestParams")
+            // 解析请求参数
+            val args: HashMap<String, String> = bundle.request.arguments?.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<HashMap<String, String>>() {})
+            } ?: hashMapOf()
+            log.debug("$executeSessionId :: 请求[${bundle.request.name}]的请求参数:${bundle.request.arguments}")
 
             // 替换占位变量后会修改 replay.fetchApi 所以这里需要使用它的一个副本
             val willModifiedFetchApi = replay.fetchApi.copy()
             // 替换占位变量
-            replaceParamBox.replacePositionAndEnvParams(
+            replaceParamBox.replaceArgAndEnvParams(
                 willModifiedFetchApi, // ！使用 replay.fetchApi 的副本！
-                testCaseRequestParams,
+                args,
                 BoomStore.readEnvs(executeSessionId)
             )
 
@@ -342,14 +350,18 @@ class BoomService {
     ): List<TestCaseExecuteDetail> {
         // 遍历并执行每个请求
         return pipeline.requests.map { bundle ->
-            // 切割请求参数
-            val testCaseRequestParams = bundle.request.param?.split("##") ?: emptyList()
-            log.debug("$executeSessionId :: HTTP 请求[${bundle.request.name}]的请求参数:$testCaseRequestParams")
+            // 解析请求参数
+            val args: HashMap<String, String> = bundle.request.arguments?.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<HashMap<String, String>>() {})
+            } ?: hashMapOf()
+            log.debug("$executeSessionId :: HTTP 请求[${bundle.request.name}]的请求参数:${bundle.request.arguments}")
 
             // 替换占位变量
-            replaceParamBox.replacePositionAndEnvParams(
+            replaceParamBox.replaceArgAndEnvParams(
                 bundle.fetchApi,
-                testCaseRequestParams,
+                args,
                 BoomStore.readEnvs(executeSessionId)
             )
 

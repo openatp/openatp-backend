@@ -109,8 +109,8 @@ data class BoomVO(
         @Schema(description = "测试案例请求名称")
         var name: String,
 
-        @Schema(description = "请求参数")
-        var param: String? = null
+        @Schema(description = "参数")
+        var arguments: String? = null
     )
 
     data class ExecCheck(
