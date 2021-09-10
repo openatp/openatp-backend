@@ -1,5 +1,6 @@
 package com.github.xiaosongfu.atp.domain.vo.boom
 
+import com.github.xiaosongfu.atp.entity.project.ProjectEnvVariable
 import io.swagger.v3.oas.annotations.media.Schema
 
 data class BoomVO(
@@ -11,6 +12,9 @@ data class BoomVO(
 
     @Schema(description = "项目服务器名称")
     var projectServerName: String,
+
+    @Schema(description = "项目环境变量")
+    var projectEnvVariable: List<ProjectEnvVariable>?,
 
     @Schema(description = "benchmark 测试数据")
     var benchmark: Benchmark? = null,

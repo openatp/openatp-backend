@@ -45,7 +45,7 @@ class ReplayTestCaseRequestBatchImportService {
         testCaseRepository.findByIdOrNull(testCaseId)?.projectRequestId?.let { projectRequestId ->
             // 读取请求的参数
             projectRequestArgumentRepository.findAllByRequestId(projectRequestId)?.map { arg ->
-                title.add("${ArgTitle}$arg")
+                title.add("${ArgTitle}${arg.argumentName}")
             }
         }
         // resp
@@ -84,7 +84,7 @@ class ReplayTestCaseRequestBatchImportService {
 
                     if (index < argSize) {
                         arguments[projectRequestArgumentList[index].argumentName] = value
-                    } else if (index in argSize until respSize) {
+                    } else if (index in argSize until argSize + respSize) {
                         execCheck[projectRequestResponseList[index - argSize].id] = value
                     } else {
                         log.warn("第 $index 列数据 [$value] 多余,不予处理,直接丢弃")

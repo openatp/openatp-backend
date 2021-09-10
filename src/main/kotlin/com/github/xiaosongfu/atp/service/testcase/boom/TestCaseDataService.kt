@@ -128,6 +128,7 @@ class TestCaseDataService {
                             name = testCase.name,
                             type = testCase.type,
                             projectServerName = projectServer.serverName,
+                            projectEnvVariable = projectEnvVariableList,
                             benchmark = benchmark
                         )
                     }
@@ -201,6 +202,7 @@ class TestCaseDataService {
                             name = testCase.name,
                             type = testCase.type,
                             projectServerName = projectServer.serverName,
+                            projectEnvVariable = projectEnvVariableList,
                             replay = replay
                         )
                     }
@@ -269,6 +271,7 @@ class TestCaseDataService {
                             name = testCase.name,
                             type = testCase.type,
                             projectServerName = projectServer.serverName,
+                            projectEnvVariable = projectEnvVariableList,
                             pipeline = BoomVO.Pipeline(
                                 requests = requests
                             )

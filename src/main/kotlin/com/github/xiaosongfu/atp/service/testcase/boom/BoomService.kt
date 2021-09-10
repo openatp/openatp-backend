@@ -60,6 +60,13 @@ class BoomService {
             return
         }
 
+        // 保存有默认值的环境变量
+        boom.projectEnvVariable?.forEach { env ->
+            env.defaultValue?.let {
+                BoomStore.saveEnv(executeSessionId, env.variableName, it)
+            }
+        }
+
         // 开始执行
         log.debug("$executeSessionId :: 开始执行：ProjectId: $projectId | TestCaseId: $testCaseId | case name(${boom.name}) | case type(${boom.type}) | projectServerName(${boom.projectServerName})")
         // TAG :: 保存 测试案例执行记录 -- 开始执行
