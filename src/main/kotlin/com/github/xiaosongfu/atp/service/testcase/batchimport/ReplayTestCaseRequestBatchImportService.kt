@@ -37,22 +37,26 @@ class ReplayTestCaseRequestBatchImportService {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun downloadTemplateExcel(testCaseId: Long): List<String>? {
-        return testCaseRepository.findByIdOrNull(testCaseId)?.projectRequestId?.let { projectRequestId ->
-            // 读取请求的响应验证
-            projectRequestResponseRepository.findAllByRequestId(projectRequestId)?.map {
-                it.fieldName
-            }
-        }
-    }
+    fun downloadTemplateExcel(testCaseId: Long): List<String> {
+        // sheet 的 title
+        val title = mutableListOf<String>()
 
-    fun downloadTemplateExcel2(testCaseId: Long): List<String>? {
-        return testCaseRepository.findByIdOrNull(testCaseId)?.projectRequestId?.let { projectRequestId ->
+        // arg
+        testCaseRepository.findByIdOrNull(testCaseId)?.projectRequestId?.let { projectRequestId ->
             // 读取请求的参数
-            projectRequestArgumentRepository.findAllByRequestId(projectRequestId)?.map {
-                it.argumentName
+            projectRequestArgumentRepository.findAllByRequestId(projectRequestId)?.map { arg ->
+                title.add("${ArgTitle}$arg")
             }
         }
+        // resp
+        testCaseRepository.findByIdOrNull(testCaseId)?.projectRequestId?.let { projectRequestId ->
+            // 读取请求的响应验证
+            projectRequestResponseRepository.findAllByRequestId(projectRequestId)?.map { check ->
+                title.add("${RespTitle}${check.fieldName}")
+            }
+        }
+
+        return title
     }
 
     fun batchImport(testCaseId: Long, excelData: List<Map<Int, String>>) {
@@ -117,7 +121,7 @@ class ReplayTestCaseRequestBatchImportService {
     }
 
     companion object {
-        const val xx = "请求参数-"
-        const val yy = "响应验证-"
+        const val ArgTitle = "请求参数-"
+        const val RespTitle = "响应验证-"
     }
 }

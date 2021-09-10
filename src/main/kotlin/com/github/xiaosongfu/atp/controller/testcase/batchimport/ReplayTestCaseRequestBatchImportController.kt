@@ -30,14 +30,8 @@ class ReplayTestCaseRequestBatchImportController {
         @Parameter(description = "测试案例 ID") @PathVariable testCaseId: Long,
         response: HttpServletResponse
     ) {
-        // 准备 sheet 头
-        val excelData = mutableListOf<String>()
-        batchImportService.downloadTemplateExcel2(testCaseId)?.map { arg ->
-            excelData.add("${ReplayTestCaseRequestBatchImportService.xx}$arg")
-        }
-        batchImportService.downloadTemplateExcel(testCaseId)?.map { check ->
-            excelData.add("${ReplayTestCaseRequestBatchImportService.yy}$check")
-        }
+        // 准备 sheet 的 title
+        val excelData = batchImportService.downloadTemplateExcel(testCaseId)
 
         // 设置头
         response.contentType = "application/vnd.ms-excel"
