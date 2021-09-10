@@ -103,12 +103,14 @@ class ReplayTestCaseRequestBatchImportService {
                     )
                 )
                 // 保存响应验证
-                execCheck.forEach {
+                execCheck.forEach { m ->
+                    val resp = projectRequestResponseList.first { it.id == m.key }
                     testCaseRequestExecCheckRepository.save(
                         TestCaseRequestExecCheck(
                             testCaseRequestId = res.id,
-                            projectRequestResponseId = it.key,
-                            wantResponseFieldValue = it.value
+                            fieldName = resp.fieldName,
+                            fieldPath = resp.fieldPath,
+                            wantResponseFieldValue = m.value
                         )
                     )
                 }

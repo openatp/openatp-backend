@@ -23,9 +23,13 @@ data class TestCaseRequestExecCheck(
     @Column(name = "test_case_request_id")
     var testCaseRequestId: Long,
 
-    @Schema(description = "需要校验的响应 ID")
-    @Column(name = "project_request_response_id")
-    var projectRequestResponseId: Long,
+    @Schema(description = "字段名称")
+    @Column(name = "field_name")
+    var fieldName: String,
+
+    @Schema(description = "字段路径[jsonpath xpath]")
+    @Column(name = "field_path")
+    var fieldPath: String,
 
     @Schema(description = "期望的响应字段值")
     @Column(name = "want_response_field_value")

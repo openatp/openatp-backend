@@ -42,7 +42,8 @@ class TestCaseRequestService {
             testCaseRequestExecCheckRepository.save(
                 TestCaseRequestExecCheck(
                     testCaseRequestId = request.id,
-                    projectRequestResponseId = check.projectRequestResponseId,
+                    fieldName = check.fieldName,
+                    fieldPath = check.fieldPath,
                     wantResponseFieldValue = check.wantResponseFieldValue
                 )
             )
@@ -78,7 +79,8 @@ class TestCaseRequestService {
         return testCaseRequestRepository.findByIdOrNull(testCaseRequestId)?.let { req ->
             val requestExecCheck = testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(req.id)?.map { check ->
                 TestCaseRequestExecCheckVO(
-                    projectRequestResponseId = check.projectRequestResponseId,
+                    fieldName = check.fieldName,
+                    fieldPath = check.fieldPath,
                     wantResponseFieldValue = check.wantResponseFieldValue
                 )
             }
@@ -114,7 +116,8 @@ class TestCaseRequestService {
         return testCaseRequestRepository.findAllByTestCaseId(testCaseId)?.map { req ->
             val requestExecCheck = testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(req.id)?.map { check ->
                 TestCaseRequestExecCheckVO(
-                    projectRequestResponseId = check.projectRequestResponseId,
+                    fieldName = check.fieldName,
+                    fieldPath = check.fieldPath,
                     wantResponseFieldValue = check.wantResponseFieldValue
                 )
             }

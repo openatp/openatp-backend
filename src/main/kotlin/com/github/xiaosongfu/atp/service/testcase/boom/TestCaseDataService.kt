@@ -70,8 +70,8 @@ class TestCaseDataService {
                         // p2 读取 project-request project-request-response 的数据 --- benchmark 只关联一个请求所以不需要遍历
                         val projectRequest = projectRequestRepository.findByIdOrNull(testCase.projectRequestId!!)
                             ?: throw ServiceException(msg = "要执行的项目请求不存在")
-                        val projectRequestResponseList =
-                            projectRequestResponseRepository.findAllByRequestId(testCase.projectRequestId!!)
+//                        val projectRequestResponseList =
+//                            projectRequestResponseRepository.findAllByRequestId(testCase.projectRequestId!!)
 
                         // p3 读取 TestCaseRequest 的信息 --- benchmark 只有一个 TestCaseRequest 所以不需要遍历
                         //
@@ -80,15 +80,12 @@ class TestCaseDataService {
                         // ExecCheck
                         val execCheck =
                             testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(testCaseRequest.id)
-                                ?.mapNotNull { check ->
-                                    projectRequestResponseList?.firstOrNull { it.id == check.projectRequestResponseId }
-                                        ?.let { resp ->
-                                            BoomVO.ExecCheck(
-                                                fieldName = resp.fieldName,
-                                                fieldPath = resp.fieldPath,
-                                                wantFieldValue = check.wantResponseFieldValue
-                                            )
-                                        }
+                                ?.map { check ->
+                                    BoomVO.ExecCheck(
+                                        fieldName = check.fieldName,
+                                        fieldPath = check.fieldPath,
+                                        wantFieldValue = check.wantResponseFieldValue
+                                    )
                                 }
                         // SaveEnvVariable
                         val saveEnvVariable =
@@ -138,8 +135,8 @@ class TestCaseDataService {
                         val projectRequest =
                             projectRequestRepository.findByIdOrNull(testCase.projectRequestId!!)
                                 ?: throw ServiceException(msg = "要执行的项目请求不存在")
-                        val projectRequestResponseList =
-                            projectRequestResponseRepository.findAllByRequestId(testCase.projectRequestId!!)
+//                        val projectRequestResponseList =
+//                            projectRequestResponseRepository.findAllByRequestId(testCase.projectRequestId!!)
 
                         // p3 读取 TestCaseRequest 的信息 --- replay 需要遍历
                         //
@@ -148,15 +145,12 @@ class TestCaseDataService {
                             // ExecCheck
                             val execCheck =
                                 testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(testCaseRequest.id)
-                                    ?.mapNotNull { check ->
-                                        projectRequestResponseList?.firstOrNull { it.id == check.projectRequestResponseId }
-                                            ?.let { resp ->
-                                                BoomVO.ExecCheck(
-                                                    fieldName = resp.fieldName,
-                                                    fieldPath = resp.fieldPath,
-                                                    wantFieldValue = check.wantResponseFieldValue
-                                                )
-                                            }
+                                    ?.map { check ->
+                                        BoomVO.ExecCheck(
+                                            fieldName = check.fieldName,
+                                            fieldPath = check.fieldPath,
+                                            wantFieldValue = check.wantResponseFieldValue
+                                        )
                                     }
                             // SaveEnvVariable
                             val saveEnvVariable =
@@ -214,23 +208,20 @@ class TestCaseDataService {
                             val projectRequest =
                                 projectRequestRepository.findByIdOrNull(testCaseRequest.projectRequestId)
                                     ?: throw ServiceException(msg = "要执行的项目请求不存在")
-                            val projectRequestResponseList =
-                                projectRequestResponseRepository.findAllByRequestId(testCaseRequest.projectRequestId)
+//                            val projectRequestResponseList =
+//                                projectRequestResponseRepository.findAllByRequestId(testCaseRequest.projectRequestId)
 
                             // p3 读取 TestCaseRequest 的信息 --- pipeline 需要遍历
                             //
                             // ExecCheck
                             val execCheck =
                                 testCaseRequestExecCheckRepository.findAllByTestCaseRequestId(testCaseRequest.id)
-                                    ?.mapNotNull { check ->
-                                        projectRequestResponseList?.firstOrNull { it.id == check.projectRequestResponseId }
-                                            ?.let { resp ->
-                                                BoomVO.ExecCheck(
-                                                    fieldName = resp.fieldName,
-                                                    fieldPath = resp.fieldPath,
-                                                    wantFieldValue = check.wantResponseFieldValue
-                                                )
-                                            }
+                                    ?.map { check ->
+                                        BoomVO.ExecCheck(
+                                            fieldName = check.fieldName,
+                                            fieldPath = check.fieldPath,
+                                            wantFieldValue = check.wantResponseFieldValue
+                                        )
                                     }
                             // SaveEnvVariable
                             val saveEnvVariable =
