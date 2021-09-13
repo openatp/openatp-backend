@@ -181,21 +181,26 @@ class BoomService {
             if (httpResponse.code == 200) { // ---> 请求成功
                 val ctx = JsonPath.parse(httpResponse.body)
                 // 执行响应验证
-                val execCheckInfo = benchmark.execCheck?.mapNotNull { check ->
-                    val fieldValue = ctx.read<Any>(check.fieldPath)
-                    log.debug("$executeSessionId :: 执行 HTTP 请求[${benchmark.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
+                val execCheckInfo = benchmark.execCheck?.map { check ->
+                    try {
+                        val fieldValue = ctx.read<Any>(check.fieldPath)
+                        log.debug("$executeSessionId :: 执行 HTTP 请求[${benchmark.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
 
-                    // 判断验证是否成功
-                    if (fieldValue != null) {
-                        // xx
                         ExecCheckInfo(
                             fieldName = check.fieldName,
                             wantFieldValue = check.wantFieldValue,
                             gotFieldValue = fieldValue.toString(),
                             checkResult = fieldValue.toString() == check.wantFieldValue
                         )
-                    } else {
-                        null
+                    } catch (e: Exception) {
+                        log.error("读取 jsonpath 失败: ${e.message}")
+
+                        ExecCheckInfo(
+                            fieldName = check.fieldName,
+                            wantFieldValue = check.wantFieldValue,
+                            gotFieldValue = "",
+                            checkResult = false
+                        )
                     }
                 }
                 // 执行保存环境变量
@@ -287,21 +292,26 @@ class BoomService {
             if (httpResponse.code == 200) { // ---> 请求成功
                 val ctx = JsonPath.parse(httpResponse.body)
                 // 执行响应验证
-                val execCheckInfo = bundle.execCheck?.mapNotNull { check ->
-                    val fieldValue = ctx.read<Any>(check.fieldPath)
-                    log.debug("$executeSessionId :: 执行 HTTP 请求[${bundle.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
+                val execCheckInfo = bundle.execCheck?.map { check ->
+                    try {
+                        val fieldValue = ctx.read<Any>(check.fieldPath)
+                        log.debug("$executeSessionId :: 执行 HTTP 请求[${bundle.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
 
-                    // 判断验证是否成功
-                    if (fieldValue != null) {
-                        // xx
                         ExecCheckInfo(
                             fieldName = check.fieldName,
                             wantFieldValue = check.wantFieldValue,
                             gotFieldValue = fieldValue.toString(),
                             checkResult = fieldValue.toString() == check.wantFieldValue
                         )
-                    } else {
-                        null
+                    } catch (e: Exception) {
+                        log.error("读取 jsonpath 失败: ${e.message}")
+
+                        ExecCheckInfo(
+                            fieldName = check.fieldName,
+                            wantFieldValue = check.wantFieldValue,
+                            gotFieldValue = "",
+                            checkResult = false
+                        )
                     }
                 }
                 // 执行保存环境变量
@@ -393,21 +403,26 @@ class BoomService {
             if (httpResponse.code == 200) { // ---> 请求成功
                 val ctx = JsonPath.parse(httpResponse.body)
                 // 执行响应验证
-                val execCheckInfo = bundle.execCheck?.mapNotNull { check ->
-                    val fieldValue = ctx.read<Any>(check.fieldPath)
-                    log.debug("$executeSessionId :: 执行 HTTP 请求[${bundle.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
+                val execCheckInfo = bundle.execCheck?.map { check ->
+                    try {
+                        val fieldValue = ctx.read<Any>(check.fieldPath)
+                        log.debug("$executeSessionId :: 执行 HTTP 请求[${bundle.request.name}]的响应验证: 字段名称[${check.fieldName}] 期望值[${check.wantFieldValue}] 实际值[$fieldValue]")
 
-                    // 判断验证是否成功
-                    if (fieldValue != null) {
-                        // xx
                         ExecCheckInfo(
                             fieldName = check.fieldName,
                             wantFieldValue = check.wantFieldValue,
                             gotFieldValue = fieldValue.toString(),
                             checkResult = fieldValue.toString() == check.wantFieldValue
                         )
-                    } else {
-                        null
+                    } catch (e: Exception) {
+                        log.error("读取 jsonpath 失败: ${e.message}")
+
+                        ExecCheckInfo(
+                            fieldName = check.fieldName,
+                            wantFieldValue = check.wantFieldValue,
+                            gotFieldValue = "",
+                            checkResult = false
+                        )
                     }
                 }
                 // 执行保存环境变量

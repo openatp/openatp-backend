@@ -21,8 +21,8 @@ class HttpBox {
 
     // OkHttpClient
     private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(Duration.ofMillis(2_000))
-        .readTimeout(Duration.ofMillis(2_000))
+        .connectTimeout(Duration.ofMillis(6_000))
+        .readTimeout(Duration.ofMillis(6_000))
         .build()
 
     // 实现 HTTP 请求和结果解析
@@ -60,11 +60,20 @@ class HttpBox {
         }
 
         // 2 执行请求
-        okHttpClient.newCall(request).execute().use { response ->
+        try {
+            okHttpClient.newCall(request).execute().use { response ->
+                return HttpResponse(
+                    code = response.code,
+                    body = response.body?.string() ?: "",
+                    duration = response.receivedResponseAtMillis - response.sentRequestAtMillis
+                )
+            }
+        } catch (e: Exception) {
+            log.error("HTTP 请求失败: ${e.message}")
             return HttpResponse(
-                code = response.code,
-                body = response.body?.string() ?: "",
-                duration = response.receivedResponseAtMillis - response.sentRequestAtMillis
+                code = 500,
+                body = e.message ?: "",
+                duration = 0
             )
         }
     }

@@ -104,7 +104,11 @@ class TestCaseExecuteService {
                     requestSuccessCount = requestSuccessCount,
                     requestSuccessRate = requestSuccessRate,
                     requestCheckCorrectCount = requestCheckCorrectCount,
-                    requestCheckCorrectRate = requestCheckCorrectRate
+                    requestCheckCorrectRate = if (requestCheckCorrectRate.isNaN()) { // 全部请求都失败的话 requestCheckCorrectRate 就会是 NaN
+                        0.0
+                    } else {
+                        requestCheckCorrectRate
+                    }
                 )
             )
         }
