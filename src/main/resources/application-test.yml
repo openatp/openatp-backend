@@ -1,0 +1,19 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: xx
+    password: xxx
+    url: jdbc:mysql://172.16.x.x:xx/openatp
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
