@@ -36,15 +36,15 @@ data class TestCaseExecuteDetail(
     var httpResponse: String,
 
     @Schema(description = "请求验证信息")
-    @Column(name = "exec_check_info", columnDefinition = "text NOT NULL")
+    @Column(name = "exec_check_info", columnDefinition = "text NULL")
     var execCheckInfo: String?,
 
     @Schema(description = "请求验证结果")
-    @Column(name = "exec_check_result", columnDefinition = "text NOT NULL")
+    @Column(name = "exec_check_result")
     var execCheckResult: Int,
 
     @Schema(description = "环境变量信息")
-    @Column(name = "save_env_variable_info", columnDefinition = "text NOT NULL")
+    @Column(name = "save_env_variable_info", columnDefinition = "text NULL")
     var saveEnvVariableInfo: String?
 ) {
     companion object {
