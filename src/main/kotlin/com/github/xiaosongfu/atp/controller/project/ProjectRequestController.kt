@@ -2,7 +2,8 @@ package com.github.xiaosongfu.atp.controller.project
 
 import com.github.xiaosongfu.atp.domain.dto.project.ProjectRequestFindResponse
 import com.github.xiaosongfu.atp.domain.dto.project.ProjectRequestInsertRequest
-import com.github.xiaosongfu.atp.entity.project.ProjectRequest
+import com.github.xiaosongfu.atp.domain.dto.project.ProjectRequestPreExecRequest
+import com.github.xiaosongfu.atp.domain.dto.project.ProjectRequestPreExecResponse
 import com.github.xiaosongfu.atp.service.project.ProjectRequestService
 import com.github.xiaosongfu.jakarta.dto.R
 import io.swagger.v3.oas.annotations.Operation
@@ -70,5 +71,18 @@ class ProjectRequestController {
         @Parameter(description = "项目 ID") @PathVariable projectId: Long
     ): R<List<ProjectRequestFindResponse>> {
         return R.success(data = projectRequestService.listWithDetail(projectId))
+    }
+
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+    @Operation(summary = "测试请求")
+    @PostMapping("/pre_exec/{projectId}/{projectServerId}")
+    fun preExec(
+        @Parameter(description = "项目 ID") @PathVariable projectId: Long,
+        @Parameter(description = "项目服务器 ID") @PathVariable projectServerId: Long,
+        @RequestBody @Valid req: ProjectRequestPreExecRequest
+    ): R<ProjectRequestPreExecResponse> {
+        return R.success(data = projectRequestService.preExec(projectId, projectServerId, req))
     }
 }

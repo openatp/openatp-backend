@@ -30,9 +30,6 @@ class TestCaseDataService {
     @Autowired
     private lateinit var projectRequestRepository: ProjectRequestRepository
 
-    @Autowired
-    private lateinit var projectRequestResponseRepository: ProjectRequestResponseRepository
-
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     // --- --- Test Case
 
