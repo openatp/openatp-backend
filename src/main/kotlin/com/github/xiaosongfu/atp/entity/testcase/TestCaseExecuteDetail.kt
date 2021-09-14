@@ -1,5 +1,8 @@
 package com.github.xiaosongfu.atp.entity.testcase
 
+import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteDetail.Companion.EXEC_CHECK_REQUEST_ERROR
+import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteDetail.Companion.EXEC_CHECK_RESULT_CORRECT
+import com.github.xiaosongfu.atp.entity.testcase.TestCaseExecuteDetail.Companion.EXEC_CHECK_RESULT_WRONG
 import io.swagger.v3.oas.annotations.media.Schema
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -51,5 +54,14 @@ data class TestCaseExecuteDetail(
         const val EXEC_CHECK_REQUEST_ERROR = 0  // HTTP请求错误
         const val EXEC_CHECK_RESULT_WRONG = 1   // 验证失败
         const val EXEC_CHECK_RESULT_CORRECT = 2 // 验证成功
+    }
+}
+
+fun Int.execCheckResultName(): String {
+    return when (this) {
+        EXEC_CHECK_REQUEST_ERROR -> "HTTP请求错误"
+        EXEC_CHECK_RESULT_WRONG -> "验证失败"
+        EXEC_CHECK_RESULT_CORRECT -> "验证成功"
+        else -> "未知"
     }
 }
