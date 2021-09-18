@@ -9,9 +9,9 @@ data class ProjectRequestPreExecRequest(
     @NotNull(message = "请求不能为空")
     var request: ProjectRequestVO,
 
-    @Schema(description = "参数")
-    var arguments: HashMap<String, String>?,
+    @Schema(description = "参数,由Map转成的json字符串")
+    var arguments: String?,
 
-    @Schema(description = "环境变量")
-    var env: HashMap<String, String>?
+    @Schema(description = "环境变量,由Map转成的json字符串")
+    var env: String?
 )

@@ -189,9 +189,19 @@ class ProjectRequestService {
 
         // 替换占位变量
         replaceParamBox.replaceArgAndEnvParams(
-            fetchApi,
-            req.arguments ?: hashMapOf(),
-            req.env ?: hashMapOf()
+            fetchApi = fetchApi,
+            args = req.arguments?.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<HashMap<String, String>>() {}
+                )
+            } ?: hashMapOf(),
+            envs = req.env?.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<HashMap<String, String>>() {}
+                )
+            } ?: hashMapOf()
         )
 
         // 封装 http 请求
