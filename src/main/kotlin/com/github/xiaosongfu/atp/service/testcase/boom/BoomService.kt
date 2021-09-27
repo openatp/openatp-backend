@@ -226,7 +226,9 @@ class BoomService {
                     executeHistoryId = executeSessionId,
                     testCaseRequestName = benchmark.request.name,
                     httpRequest = objectMapper.writeValueAsString(httpRequest),
-                    httpResponse = objectMapper.writeValueAsString(httpResponse),
+                    httpRequestTime = httpResponse.duration,
+                    httpResponseCode = httpResponse.code,
+                    httpResponseBody = objectMapper.writeValueAsString(httpResponse.body),
                     execCheckInfo = objectMapper.writeValueAsString(execCheckInfo),
                     execCheckResult = if (execCheckInfo?.all { it.checkResult } == true) {
                         TestCaseExecuteDetail.EXEC_CHECK_RESULT_CORRECT
@@ -241,7 +243,9 @@ class BoomService {
                     executeHistoryId = executeSessionId,
                     testCaseRequestName = benchmark.request.name,
                     httpRequest = objectMapper.writeValueAsString(httpRequest),
-                    httpResponse = objectMapper.writeValueAsString(httpResponse),
+                    httpRequestTime = httpResponse.duration,
+                    httpResponseCode = httpResponse.code,
+                    httpResponseBody = objectMapper.writeValueAsString(httpResponse.body),
                     execCheckInfo = null,
                     execCheckResult = TestCaseExecuteDetail.EXEC_CHECK_REQUEST_ERROR,
                     saveEnvVariableInfo = null
@@ -337,7 +341,9 @@ class BoomService {
                     executeHistoryId = executeSessionId,
                     testCaseRequestName = bundle.request.name,
                     httpRequest = objectMapper.writeValueAsString(httpRequest),
-                    httpResponse = objectMapper.writeValueAsString(httpResponse),
+                    httpRequestTime = httpResponse.duration,
+                    httpResponseCode = httpResponse.code,
+                    httpResponseBody = objectMapper.writeValueAsString(httpResponse.body),
                     execCheckInfo = objectMapper.writeValueAsString(execCheckInfo),
                     execCheckResult = if (execCheckInfo?.all { it.checkResult } == true) {
                         TestCaseExecuteDetail.EXEC_CHECK_RESULT_CORRECT
@@ -352,7 +358,9 @@ class BoomService {
                     executeHistoryId = executeSessionId,
                     testCaseRequestName = bundle.request.name,
                     httpRequest = objectMapper.writeValueAsString(httpRequest),
-                    httpResponse = objectMapper.writeValueAsString(httpResponse),
+                    httpRequestTime = httpResponse.duration,
+                    httpResponseCode = httpResponse.code,
+                    httpResponseBody = objectMapper.writeValueAsString(httpResponse.body),
                     execCheckInfo = null,
                     execCheckResult = TestCaseExecuteDetail.EXEC_CHECK_REQUEST_ERROR,
                     saveEnvVariableInfo = null
@@ -448,7 +456,9 @@ class BoomService {
                     executeHistoryId = executeSessionId,
                     testCaseRequestName = bundle.request.name,
                     httpRequest = objectMapper.writeValueAsString(httpRequest),
-                    httpResponse = objectMapper.writeValueAsString(httpResponse),
+                    httpRequestTime = httpResponse.duration,
+                    httpResponseCode = httpResponse.code,
+                    httpResponseBody = objectMapper.writeValueAsString(httpResponse.body),
                     execCheckInfo = objectMapper.writeValueAsString(execCheckInfo),
                     execCheckResult = if (execCheckInfo?.all { it.checkResult } == true) {
                         TestCaseExecuteDetail.EXEC_CHECK_RESULT_CORRECT
@@ -463,7 +473,9 @@ class BoomService {
                     executeHistoryId = executeSessionId,
                     testCaseRequestName = bundle.request.name,
                     httpRequest = objectMapper.writeValueAsString(httpRequest),
-                    httpResponse = objectMapper.writeValueAsString(httpResponse),
+                    httpRequestTime = httpResponse.duration,
+                    httpResponseCode = httpResponse.code,
+                    httpResponseBody = objectMapper.writeValueAsString(httpResponse.body),
                     execCheckInfo = null,
                     execCheckResult = TestCaseExecuteDetail.EXEC_CHECK_REQUEST_ERROR,
                     saveEnvVariableInfo = null

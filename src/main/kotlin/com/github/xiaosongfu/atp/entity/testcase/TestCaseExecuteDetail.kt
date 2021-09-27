@@ -34,9 +34,17 @@ data class TestCaseExecuteDetail(
     @Column(name = "http_request", columnDefinition = "text NOT NULL")
     var httpRequest: String,
 
-    @Schema(description = "HTTP 响应")
-    @Column(name = "http_response", columnDefinition = "text NOT NULL")
-    var httpResponse: String,
+    @Schema(description = "HTTP 请求耗时(单位:ms)")
+    @Column(name = "http_request_time", columnDefinition = "int NOT NULL")
+    var httpRequestTime: Long,
+
+    @Schema(description = "HTTP 响应码")
+    @Column(name = "http_response_code", columnDefinition = "int NOT NULL")
+    var httpResponseCode: Int,
+
+    @Schema(description = "HTTP 响应体")
+    @Column(name = "http_response_body", columnDefinition = "text NOT NULL")
+    var httpResponseBody: String,
 
     @Schema(description = "请求验证信息")
     @Column(name = "exec_check_info", columnDefinition = "text NULL")
